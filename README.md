@@ -5,7 +5,7 @@ Este projeto foi desenvolvido utilizando:
 
 - Java 21
 - JDK Amazon Corretto 21.0.11
-- Spring Boot 3.5.14
+- Spring Boot 4.0.6
 - Maven
 
 ## Identificação do Projeto
