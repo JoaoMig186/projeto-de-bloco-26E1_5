@@ -1,0 +1,30 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            #- id: user
+            #  uri: lb://USER
+            #  predicates:
+            #   - Path=/users/**
+
+            #- id: store
+            #  uri: lb://STORE
+            #  predicates:
+            #    - Path=/stores/**
+            #  filters:
+            #   - StripPrefix=1
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+

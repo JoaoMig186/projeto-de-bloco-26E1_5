@@ -12,6 +12,7 @@
     <description>Sistema de entregas de materiais de construção</description>
     <modules>
         <module>discovery-server</module>
+        <module>api-gateway</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
@@ -60,5 +61,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>
