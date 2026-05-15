@@ -8,3 +8,9 @@ Este projeto foi desenvolvido utilizando:
 - Spring Boot 3.5.14
 - Maven
 
+## Identificação do Projeto
+
+Este projeto segue a estrutura Maven com os seguintes identificadores:
+
+- **Group (GroupId):** com.infnet
+- **Artifact (ArtifactId):** nome-do-microserviço (ex: user-service, gateway-service, eureka-server)
