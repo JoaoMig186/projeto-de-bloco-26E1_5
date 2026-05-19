@@ -8,10 +8,10 @@ spring:
       server:
         webmvc:
           routes:
-            #- id: user
-            #  uri: lb://USER
-            #  predicates:
-            #   - Path=/users/**
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/users/**
 
             #- id: store
             #  uri: lb://STORE
