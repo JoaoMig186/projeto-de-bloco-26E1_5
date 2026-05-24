@@ -45,6 +45,20 @@ services:
       postgres:
         condition: service_healthy
 
+    # STORE SERVICE
+  store-service:
+    build: ../store-service
+    container_name: store-service
+
+    networks:
+      - microservices-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
   # POSTGRES
   postgres:
     image: postgres:17
