@@ -1,0 +1,45 @@
+package com.infnet.delivery_sevice.domain.entity;
+
+import com.infnet.delivery_sevice.domain.entity.enums.VehicleType;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.UUID;
+
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public class Driver {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private UUID id;
+
+    private String name;
+
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    private VehicleType vehicleType;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private Boolean available;
+
+    public static Driver builder(
+            String name,
+            String phone,
+            VehicleType vehicleType
+    ){
+        Driver driver = new Driver();
+        driver.name = name;
+        driver.phone = phone;
+        driver.vehicleType = vehicleType;
+        driver.available = true;
+
+        return driver;
+    };
+}
