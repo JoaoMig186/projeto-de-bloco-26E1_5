@@ -13,12 +13,18 @@ spring:
               predicates:
                 - Path=/users/**
 
+            - id: review-service
+              uri: lb://REVIEW-SERVICE
+              predicates:
+                - Path=/reviews/**
+
             #- id: store
             #  uri: lb://STORE
             #  predicates:
             #    - Path=/stores/**
             #  filters:
             #   - StripPrefix=1
+
 eureka:
   client:
     service-url:
@@ -27,4 +33,3 @@ eureka:
     fetch-registry: true
   instance:
     instance-id: ${spring.application.name}:${random.value}
-

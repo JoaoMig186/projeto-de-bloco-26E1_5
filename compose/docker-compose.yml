@@ -59,6 +59,20 @@ services:
       postgres:
         condition: service_healthy
 
+  # REVIEW SERVICE
+  review-service:
+    build: ../review-service
+    container_name: review-service
+
+    networks:
+      - microservices-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
   # POSTGRES
   postgres:
     image: postgres:17
