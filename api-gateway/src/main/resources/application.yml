@@ -12,13 +12,6 @@ spring:
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/users/**
-
-            #- id: store
-            #  uri: lb://STORE
-            #  predicates:
-            #    - Path=/stores/**
-            #  filters:
-            #   - StripPrefix=1
 eureka:
   client:
     service-url:
@@ -27,4 +20,5 @@ eureka:
     fetch-registry: true
   instance:
     instance-id: ${spring.application.name}:${random.value}
-
+security:
+  public-key: classpath:keys/public_key.pem

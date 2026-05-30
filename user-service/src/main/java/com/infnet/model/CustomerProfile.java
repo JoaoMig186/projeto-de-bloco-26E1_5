@@ -1,8 +1,8 @@
 package com.infnet.model;
 
 import com.infnet.model.enums.Role;
+import com.infnet.model.enums.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,26 +11,29 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-
-@Table(name = "tb_users",schema = "user_service")
 @Entity
+@Table(name = "tb_customer_profiles",schema = "user_service")
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class CustomerProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
-    private String name;
+    @OneToOne
+    @MapsId
+    private User user;
 
-    private String email;
+    private String address;
 
-    private String password;
+    private Double lat;
+
+    private Double lon;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Status status;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -38,13 +41,12 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    protected User() {
+    protected CustomerProfile() {
     }
 
-    public User(String name, String email, String password,Role role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    public CustomerProfile(User user, String address) {
+        this.user = user;
+        this.address = address;
+        this.status = Status.PENDING_GEOCODE;
     }
 }
