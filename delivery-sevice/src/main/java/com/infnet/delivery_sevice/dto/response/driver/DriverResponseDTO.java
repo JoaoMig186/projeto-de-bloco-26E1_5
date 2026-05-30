@@ -1,13 +1,23 @@
-package com.infnet.delivery_sevice.dto.response;
+package com.infnet.delivery_sevice.dto.response.driver;
 
 import com.infnet.delivery_sevice.domain.entity.enums.VehicleType;
 
 import java.util.UUID;
 
 public record DriverResponseDTO(
+
         UUID id,
+
         String name,
+
+        String phone,
+
         VehicleType vehicleType,
+
+        Double latitude,
+
+        Double longitude,
+
         Boolean available
 ) {
 }

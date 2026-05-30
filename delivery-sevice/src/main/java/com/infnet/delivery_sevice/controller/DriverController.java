@@ -1,7 +1,10 @@
 package com.infnet.delivery_sevice.controller;
 
-import com.infnet.delivery_sevice.dto.request.DriverRequestDTO;
-import com.infnet.delivery_sevice.dto.response.DriverResponseDTO;
+import com.infnet.delivery_sevice.domain.entity.enums.VehicleType;
+import com.infnet.delivery_sevice.dto.request.driver.DriverLocationUpdateDTO;
+import com.infnet.delivery_sevice.dto.request.driver.DriverRequestDTO;
+import com.infnet.delivery_sevice.dto.request.driver.DriverUpdateDTO;
+import com.infnet.delivery_sevice.dto.response.driver.DriverResponseDTO;
 import com.infnet.delivery_sevice.service.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +46,82 @@ public class DriverController {
         );
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<DriverResponseDTO> findById(
             @PathVariable UUID id
-            ){
-        return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
+            ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.findById(id));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<Page<DriverResponseDTO>> findAvailableDrivers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.findAvailableDrivers(page, size));
+    }
+
+    @GetMapping("/available/vehicle")
+    public ResponseEntity<Page<DriverResponseDTO>> findAvailableDriversByVehicle(
+            @RequestParam VehicleType vehicleType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.findAvailableDriversByVehicle(vehicleType, page, size));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DriverResponseDTO> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody DriverUpdateDTO dto
+    ) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.update(id, dto));
+    }
+
+    @PatchMapping("/{id}/availability")
+    public ResponseEntity<DriverResponseDTO> setAvailable(
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.setAvailable(id));
+    }
+
+    @PatchMapping("/{id}/unavailable")
+    public ResponseEntity<DriverResponseDTO> setUnavailable(
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.setUnavailable(id));
+    }
+
+    @PatchMapping("/{id}/location")
+    public ResponseEntity<DriverResponseDTO> updateLocation(
+            @PathVariable UUID id,
+            @Valid @RequestBody DriverLocationUpdateDTO dto
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.updateLocation(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id
+    ) {
+
+        service.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

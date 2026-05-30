@@ -29,7 +29,7 @@ public class Driver {
 
     private Boolean available;
 
-    public static Driver builder(
+    public static Driver create(
             String name,
             String phone,
             VehicleType vehicleType
@@ -42,4 +42,30 @@ public class Driver {
 
         return driver;
     };
+
+    public void update(
+            String name,
+            String phone,
+            VehicleType vehicleType
+    ) {
+        this.name = name;
+        this.phone = phone;
+        this.vehicleType = vehicleType;
+    }
+
+    public void becomeAvailable() {
+        this.available = true;
+    }
+
+    public void becomeUnavailable() {
+        this.available = false;
+    }
+
+    public void updateLocation(
+            Double latitude,
+            Double longitude
+    ) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }

@@ -1,4 +1,4 @@
-package com.infnet.delivery_sevice.dto.request;
+package com.infnet.delivery_sevice.dto.request.delivery;
 
 import java.util.UUID;
 
