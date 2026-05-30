@@ -16,6 +16,8 @@
         <module>user-service</module>
         <module>store-service</module>
         <module>geocode-fake-service</module>
+        <module>review-service</module>
+        <module>store-service</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
@@ -42,17 +44,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot4</artifactId>
-                <version>2.4.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.46</version>
-                <scope>compile</scope>
-            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>
