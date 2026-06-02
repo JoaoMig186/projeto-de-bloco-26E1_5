@@ -15,7 +15,10 @@
         <module>api-gateway</module>
         <module>user-service</module>
         <module>store-service</module>
+        <module>geocode-fake-service</module>
         <module>review-service</module>
+        <module>store-service</module>
+        <module>delivery-service</module>
     </modules>
     <packaging>pom</packaging>
     <properties>

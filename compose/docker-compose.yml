@@ -45,6 +45,18 @@ services:
       postgres:
         condition: service_healthy
 
+  # USER SERVICE
+  geocode-fake-service:
+    build: ../geocode-fake-service
+    container_name: geocode-fake-service
+
+    networks:
+      - microservices-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
     # STORE SERVICE
   store-service:
     build: ../store-service
@@ -93,7 +105,50 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  kafka:
+    image: apache/kafka:4.1.0
+    container_name: microservices-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
 
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://kafka:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - microservices-network
+  kafka-ui:
+      image: provectuslabs/kafka-ui:latest
+      container_name: microservices-kafka-ui
+      depends_on:
+        kafka:
+          condition: service_healthy
+      ports:
+        - "8085:8080"
+      environment:
+        KAFKA_CLUSTERS_0_NAME: microservices-local
+        KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      networks:
+        - microservices-network
 volumes:
   postgres_data:
 
