@@ -6,15 +6,18 @@ import com.infnet.exception.AuthorizationException;
 import com.infnet.exception.EmailAlreadyRegisteredException;
 import com.infnet.exception.ForbiddenAuthorizationException;
 import com.infnet.kafka.KafkaService;
+import com.infnet.metrics.UserMetrics;
 import com.infnet.model.CustomerProfile;
 import com.infnet.model.User;
 import com.infnet.model.enums.Role;
+import com.infnet.model.enums.Status;
 import com.infnet.repository.CustomerProfileRepository;
 import com.infnet.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,9 +31,10 @@ public class UserService {
     private JwtService jwtService;
     private CustomerProfileRepository customerRepository;
     private GeocodeService geocodeService;
+    private UserMetrics metrics;
 
     public User registerUser(UserRegisterDTO dto, Role role) {
-        repository.findUserByEmail(dto.email()).ifPresent(user -> {
+        repository.findUserByEmailIgnoreCase(dto.email()).ifPresent(user -> {
             throw new EmailAlreadyRegisteredException(("Email already registered"));
         });
 
@@ -43,6 +47,12 @@ public class UserService {
         if(role == Role.CUSTOMER){
             registerCustomerProfile(user,dto.address());
         }
+        if(role == Role.STORE_OWNER){
+            metrics.incrementTotalStoreOwners();
+            metrics.incrementTotalActiveStoreOwners();
+        }
+        metrics.incrementTotalUsers();
+
         return user;
     }
 
@@ -51,12 +61,16 @@ public class UserService {
             user,
             address
         );
+
+        metrics.incrementTotalCustomers();
+        metrics.incrementTotalPendingGeocodeCustomers();
+
         geocodeService.getCustomerGeocode(user.getId(),address);
         customerRepository.save(customer);
     }
 
     public String userAuthLogin(UserLoginDTO dto) {
-        User user = repository.findUserByEmail(dto.email()).orElseThrow(AuthorizationException::new);
+        User user = repository.findUserByEmailIgnoreCase(dto.email()).orElseThrow(AuthorizationException::new);
 
         if(!encoder.matches(dto.password(),user.getPassword())){
             throw new AuthorizationException();
@@ -102,4 +116,47 @@ public class UserService {
             throw new ForbiddenAuthorizationException("Forbidden request for the User");
         }
     }
+
+    @Transactional
+    public void updateUserStatus(String token, Long id, Status status) {
+        Claims claims = jwtService.validateToken(token.split(" ")[1]);
+        Long userId = claims.get("id", Long.class);
+        String tokenRole = claims.get("role", String.class);
+
+        if (Objects.equals(id, userId) || Role.valueOf(tokenRole) == Role.ADMIN) {
+            User user = repository.findById(id).get();
+            user.setStatus(status);
+            Role userRole = user.getRole();
+
+            if (userRole == Role.CUSTOMER) {
+                CustomerProfile customerProfile = customerRepository.findById(id).get();
+                customerProfile.setStatus(status);
+                if(customerProfile.getStatus() != Status.PENDING_GEOCODE) {
+                    switch (status) {
+                        case ACTIVE:
+                            metrics.decrementTotalInactiveCustomers();
+                            metrics.incrementTotalActiveCustomers();
+                        case INACTIVE:
+                            metrics.decrementTotalActiveCustomers();
+                            metrics.incrementTotalInactiveCustomers();
+                    }
+                }
+            }
+
+            if (userRole == Role.STORE_OWNER) {
+                switch (status) {
+                    case ACTIVE:
+                        metrics.decrementTotalInactiveStoreOwners();
+                        metrics.incrementTotalActiveStoreOwners();
+                    case INACTIVE:
+                        metrics.decrementTotalActiveStoreOwners();
+                        metrics.incrementTotalInactiveStoreOwners();
+                }
+            }
+
+        }else{
+            throw new ForbiddenAuthorizationException("Forbidden request for the User");
+        }
+    }
+
 }

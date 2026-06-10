@@ -11,7 +11,7 @@ public class KafkaService {
     private final KafkaTemplate<String, CustomerCreatedEvent> kafkaTemplate;
 
     private void sendEvent(CustomerCreatedEvent event){
-        kafkaTemplate.send("microservices.customer.created",
+        kafkaTemplate.send("icimento.customer.created",
                 String.valueOf(event.eventId()),
                 event
         );

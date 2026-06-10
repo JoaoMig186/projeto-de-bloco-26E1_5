@@ -14,7 +14,7 @@ public class KafkaGeocodeListener {
     private final GeocodeService service;
     private final KafkaService kafkaService;
 
-    @KafkaListener(topics = "microservices.customer.created")
+    @KafkaListener(topics = "icimento.customer.created")
         public void receiveCustomerCreatedEvent(CustomerCreatedEvent event){
         System.out.println("EVENTO CUSTOMER CREATED RECEBIDO!");
         Geocode geocode = service.getUserGeocode(event.address());
