@@ -11,7 +11,7 @@ public class KafkaService {
     private final KafkaTemplate<String, GeocodeEvent> kafkaTemplate;
 
     private void sendEvent(GeocodeEvent event){
-        kafkaTemplate.send("microservices.geocode.customer.scrape",
+        kafkaTemplate.send("icimento.geocode.customer.scrape",
                 String.valueOf(event.eventId()),
                 event
         );

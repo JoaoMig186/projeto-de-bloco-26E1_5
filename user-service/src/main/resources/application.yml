@@ -2,17 +2,19 @@ spring:
   application:
     name: user-service
   profiles:
-    active: dev
+    active: prod
 
 security:
   private-key: classpath:keys/private_key.pem
   public-key: classpath:keys/public_key.pem
 
 management:
+  server:
+    port: 8081
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
 api:
   endpoints:
     GEOCODE-FAKE-SERVICE

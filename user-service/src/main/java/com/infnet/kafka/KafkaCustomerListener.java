@@ -1,6 +1,7 @@
 package com.infnet.kafka;
 
 import com.infnet.events.GeocodeEvent;
+import com.infnet.metrics.UserMetrics;
 import com.infnet.model.CustomerProfile;
 import com.infnet.model.enums.Status;
 import com.infnet.repository.CustomerProfileRepository;
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Component;
 public class KafkaCustomerListener {
 
     private final CustomerProfileRepository repository;
+    private final UserMetrics metrics;
 
-    @KafkaListener(topics = "microservices.geocode.customer.scrape.success")
+    @KafkaListener(topics = "icimento.geocode.customer.scrape")
     public void receiveGeocodeEvent(GeocodeEvent event){
 
         System.out.println("EVENTO GEOCODE RECEBIDO!");
@@ -25,6 +27,9 @@ public class KafkaCustomerListener {
         customer.setLat(event.lat());
         customer.setLon(event.lon());
         customer.setStatus(Status.ACTIVE);
+
+        metrics.decrementTotalPendingGeocodeCustomers();
+        metrics.incrementTotalActiveCustomers();
 
         repository.save(customer);
     }
