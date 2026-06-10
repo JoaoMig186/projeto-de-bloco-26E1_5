@@ -7,6 +7,7 @@ import car.micro.DTO.request.AdicionarItemDTO;
 import car.micro.domain.Carrinho;
 import car.micro.domain.ENUM.StatusCarrinho;
 import car.micro.domain.ItemCarrinho;
+import car.micro.metrics.CarrinhoMetrics;
 import car.micro.repository.CarrinhoRepository;
 import car.micro.service.mock.LojaClientMock;
 import car.micro.service.mock.ProdutoClientMock;
@@ -20,6 +21,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 public class CarrinhoService {
+    private final CarrinhoMetrics metrics;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CarrinhoRepository repository;
     private final UsuarioClientMock usuarioClientMock;
@@ -39,8 +41,10 @@ public class CarrinhoService {
 
         carrinho.setUsuarioId(usuarioId);
         carrinho.setStatus(StatusCarrinho.ABERTO);
+        metrics.incrementarCarrinhosCriados();
 
         return repository.save(carrinho);
+
     }
 
     public Carrinho buscarCarrinho(Long carrinhoId) {
@@ -178,6 +182,7 @@ public class CarrinhoService {
         );
 
         repository.save(carrinho);
+        metrics.incrementarCarrinhosFinalizados();
 
         redisTemplate.delete(
                 "cart:" + carrinhoId
@@ -196,6 +201,8 @@ public class CarrinhoService {
         );
 
         repository.save(carrinho);
+        metrics.incrementarCarrinhosRecusados();
+
         redisTemplate.delete(
                 "cart:" + carrinhoId
         );

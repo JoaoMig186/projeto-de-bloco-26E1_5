@@ -84,7 +84,23 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+  # CAR SERVICE
+  cart-service:
+    build: ../car-service
+    container_name: car-service
 
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      postgres:
+        condition: service_healthy
+
+      kafka:
+        condition: service_healthy
   # POSTGRES
   postgres:
     image: postgres:17
