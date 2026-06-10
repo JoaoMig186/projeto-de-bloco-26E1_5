@@ -1,36 +1,30 @@
 package car.micro.service;
 
-import car.micro.DTO.ItemDeliveryDTO;
 import car.micro.DTO.mock.LojaDTO;
 import car.micro.DTO.mock.ProdutoDTO;
 import car.micro.DTO.mock.UsuarioDTO;
 import car.micro.DTO.request.AdicionarItemDTO;
-import car.micro.DTO.request.DeliveryRequestDTO;
-
-import car.micro.DTO.request.PaymentRequestDTO;
-
-import car.micro.DTO.response.DeliveryResponseDTO;
-import car.micro.DTO.response.PaymentResponseDTO;
 import car.micro.domain.Carrinho;
+import car.micro.domain.ENUM.StatusCarrinho;
 import car.micro.domain.ItemCarrinho;
 import car.micro.repository.CarrinhoRepository;
-import car.micro.service.mock.*;
+import car.micro.service.mock.LojaClientMock;
+import car.micro.service.mock.ProdutoClientMock;
+import car.micro.service.mock.UsuarioClientMock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class CarrinhoService {
-
+    private final RedisTemplate<String, Object> redisTemplate;
     private final CarrinhoRepository repository;
-    //times externos mocados (por enquanto)
     private final UsuarioClientMock usuarioClientMock;
     private final ProdutoClientMock produtoClientMock;
     private final LojaClientMock lojaClientMock;
-    private final DeliveryClientMock deliveryClientMock;
-    private final PagamentoClientMock pagamentoClientMock;
 
     public Carrinho criarCarrinho(Long usuarioId) {
 
@@ -42,14 +36,18 @@ public class CarrinhoService {
         }
 
         Carrinho carrinho = new Carrinho();
+
         carrinho.setUsuarioId(usuarioId);
+        carrinho.setStatus(StatusCarrinho.ABERTO);
 
         return repository.save(carrinho);
     }
 
     public Carrinho buscarCarrinho(Long carrinhoId) {
+
         return repository.findById(carrinhoId)
-                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException("Carrinho não encontrado"));
     }
 
     public Carrinho adicionarItem(
@@ -59,8 +57,18 @@ public class CarrinhoService {
 
         Carrinho carrinho = buscarCarrinho(carrinhoId);
 
+        if (carrinho.getStatus() != StatusCarrinho.ABERTO) {
+            throw new RuntimeException(
+                    "Carrinho não pode ser alterado"
+            );
+        }
+
         ProdutoDTO produto =
                 produtoClientMock.buscarProduto(dto.produtoId());
+
+        if (produto == null) {
+            throw new RuntimeException("Produto não encontrado");
+        }
 
         LojaDTO loja =
                 lojaClientMock.buscarLoja(1L);
@@ -71,22 +79,20 @@ public class CarrinhoService {
         item.setLojaId(loja.id());
 
         item.setNomeProduto(produto.nome());
+
         item.setPreco(produto.preco());
 
         item.setQuantidade(dto.quantidade());
 
         item.setPeso(produto.peso());
+
         item.setFragil(produto.fragil());
 
         item.setCepLoja(loja.cep());
 
-        item.setSubtotal(
-                produto.preco().multiply(
-                        BigDecimal.valueOf(dto.quantidade())
-                )
-        );
-
         item.setCarrinho(carrinho);
+
+        item.calcularSubtotal();
 
         carrinho.getItens().add(item);
 
@@ -95,10 +101,16 @@ public class CarrinhoService {
         return repository.save(carrinho);
     }
 
-    public Carrinho removerItem(Long carrinhoId, Long itemId) {
+    public Carrinho removerItem(
+            Long carrinhoId,
+            Long itemId
+    ) {
+
         Carrinho carrinho = buscarCarrinho(carrinhoId);
 
-        carrinho.getItens().removeIf(item -> item.getId().equals(itemId));
+        carrinho.getItens()
+                .removeIf(item ->
+                        item.getId().equals(itemId));
 
         carrinho.calcularTotal();
 
@@ -106,6 +118,7 @@ public class CarrinhoService {
     }
 
     public Carrinho limparCarrinho(Long carrinhoId) {
+
         Carrinho carrinho = buscarCarrinho(carrinhoId);
 
         carrinho.getItens().clear();
@@ -115,81 +128,76 @@ public class CarrinhoService {
         return repository.save(carrinho);
     }
 
-    public DeliveryRequestDTO gerarDeliveryRequest(Long carrinhoId, String cepEntrega) {
+    public Carrinho iniciarCheckout(Long carrinhoId) {
+
         Carrinho carrinho = buscarCarrinho(carrinhoId);
 
-        return new DeliveryRequestDTO(
-                carrinho.getId(),
-                carrinho.getUsuarioId(),
-                carrinho.getTotal(),
-                cepEntrega,
-                carrinho.getItens()
-                        .stream()
-                        .map(item -> new ItemDeliveryDTO(
-                                item.getProdutoId(),
-                                item.getLojaId(),
-                                item.getCepLoja(),
-                                item.getQuantidade(),
-                                item.getPeso(),
-                                item.getFragil()
-                        ))
-                        .toList()
-        );
-    }
-    public DeliveryResponseDTO calcularFrete(
-            Long carrinhoId,
-            String cepEntrega
-    ) {
-
-        DeliveryRequestDTO request =
-                gerarDeliveryRequest(carrinhoId, cepEntrega);
-
-        return deliveryClientMock.calcularFrete(request);
-    }
-
-    public PaymentResponseDTO realizarPagamento(
-            Long carrinhoId,
-            BigDecimal frete
-    ) {
-
-        PaymentRequestDTO request =
-                gerarPaymentRequest(carrinhoId, frete);
-
-        PaymentResponseDTO response =
-                pagamentoClientMock.pagar(request);
-
-        confirmarPagamento(
-                carrinhoId,
-                response.status()
-        );
-
-        return response;
-    }
-
-    public PaymentRequestDTO gerarPaymentRequest(Long carrinhoId, BigDecimal frete) {
-        Carrinho carrinho = buscarCarrinho(carrinhoId);
-        carrinho.calcularTotal();
-        BigDecimal valorFinal = carrinho.getTotal().add(frete);
-
-        return new PaymentRequestDTO(
-                carrinho.getId(),
-                carrinho.getUsuarioId(),
-                valorFinal
-        );
-    }
-    public void confirmarPagamento(Long carrinhoId, String status) {
-        Carrinho carrinho = buscarCarrinho(carrinhoId);
-
-        if ("APROVADO".equalsIgnoreCase(status)) {
-
-            carrinho.getItens().clear();
-            carrinho.calcularTotal();
-
-            repository.save(carrinho);
-
-            System.out.println("SUCESSO: Carrinho " + carrinhoId + " limpo após pagamento aprovado.");
-        } else {
-            System.out.println("AVISO: Pagamento não aprovado para o carrinho " + carrinhoId + ". Status: " + status);
+        if (carrinho.getItens().isEmpty()) {
+            throw new RuntimeException(
+                    "Carrinho vazio"
+            );
         }
+
+        carrinho.setStatus(
+                StatusCarrinho.AGUARDANDO_PAGAMENTO
+        );
+
+        repository.save(carrinho);
+        redisTemplate.opsForValue().set(
+                "cart:" + carrinho.getId(),
+                carrinho,
+                Duration.ofMinutes(30)
+        );
+        /*
+         * Aqui você publicaria o evento para o Order:
+         *
+         * CheckoutIniciadoEvent event =
+         *      new CheckoutIniciadoEvent(
+         *          carrinho.getId(),
+         *          carrinho.getUsuarioId(),
+         *          carrinho.getTotal(),
+         *          carrinho.getItens()
+         *      );
+         *
+         * kafkaTemplate.send(
+         *      "checkout-iniciado",
+         *      event
+         * );
+         */
+
+        return carrinho;
+    }
+
+    public void checkoutAprovado(Long carrinhoId) {
+
+        Carrinho carrinho =
+                buscarCarrinho(carrinhoId);
+
+        carrinho.setStatus(
+                StatusCarrinho.PAGO
+        );
+
+        repository.save(carrinho);
+
+        redisTemplate.delete(
+                "cart:" + carrinhoId
+        );
+
+        repository.delete(carrinho);
+    }
+
+    public void checkoutRecusado(Long carrinhoId) {
+
+        Carrinho carrinho =
+                buscarCarrinho(carrinhoId);
+
+        carrinho.setStatus(
+                StatusCarrinho.ABERTO
+        );
+
+        repository.save(carrinho);
+        redisTemplate.delete(
+                "cart:" + carrinhoId
+        );
     }
 }

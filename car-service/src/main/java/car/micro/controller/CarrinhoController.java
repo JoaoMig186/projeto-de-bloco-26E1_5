@@ -1,10 +1,7 @@
 package car.micro.controller;
 
 import car.micro.DTO.request.AdicionarItemDTO;
-import car.micro.DTO.response.DeliveryResponseDTO;
-import car.micro.DTO.response.PaymentResponseDTO;
 import car.micro.domain.Carrinho;
-import car.micro.domain.ItemCarrinho;
 import car.micro.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

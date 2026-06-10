@@ -1,7 +1,5 @@
 package car.micro.service.mock;
 
-import car.micro.DTO.request.PaymentRequestDTO;
-import car.micro.DTO.response.PaymentResponseDTO;
 import org.springframework.stereotype.Service;
 
 @Service
