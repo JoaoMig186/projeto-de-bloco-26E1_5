@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
+    boolean existsByStoreIdAndAuthorId(Long storeId, Long authorId);
+
     List<Review> findByStoreId(Long storeId);
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.storeId = :storeId")

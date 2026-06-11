@@ -17,6 +17,7 @@ spring:
               uri: lb://REVIEW-SERVICE
               predicates:
                 - Path=/reviews/**
+                - Method=GET
 
             #- id: store
             #  uri: lb://STORE
