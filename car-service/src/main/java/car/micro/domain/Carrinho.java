@@ -1,5 +1,6 @@
 package car.micro.domain;
 
+import car.micro.domain.ENUM.StatusCarrinho;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
 @Table(name = "carrinhos")
 @Getter
@@ -20,8 +20,10 @@ public class Carrinho {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private Long usuarioId;
+
+    @Enumerated(EnumType.STRING)
+    private StatusCarrinho status;
 
     @OneToMany(
             mappedBy = "carrinho",
@@ -30,10 +32,8 @@ public class Carrinho {
     )
     private List<ItemCarrinho> itens = new ArrayList<>();
 
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
 
-    @Column(updatable = false)
     private LocalDateTime dataCriacao;
 
     private LocalDateTime dataAtualizacao;
@@ -42,6 +42,11 @@ public class Carrinho {
     public void prePersist() {
         dataCriacao = LocalDateTime.now();
         dataAtualizacao = LocalDateTime.now();
+
+        if (status == null) {
+            status = StatusCarrinho.ABERTO;
+        }
+
         calcularTotal();
     }
 
@@ -56,9 +61,8 @@ public class Carrinho {
         total = itens.stream()
                 .map(item -> {
                     item.calcularSubtotal();
-                    return item.getSubtotal() != null ? item.getSubtotal() : BigDecimal.ZERO;
+                    return item.getSubtotal();
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
 }

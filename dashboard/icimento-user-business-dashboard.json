@@ -1,0 +1,182 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Usuários",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_users_total"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Total Clientes",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_customers_total"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Total Lojistas",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_store_owners_total"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Pendentes Geocode",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_pending_geocode_customers"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Clientes Ativos x Inativos",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_active_customers",
+          "legendFormat": "Ativos"
+        },
+        {
+          "expr": "icimento_user_service_total_inactive_customers",
+          "legendFormat": "Inativos"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Lojistas Ativos x Inativos",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "icimento_user_service_total_active_store_owners",
+          "legendFormat": "Ativos"
+        },
+        {
+          "expr": "icimento_user_service_total_inactive_store_owners",
+          "legendFormat": "Inativos"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Novos Usuários",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "rate(icimento_user_service_total_users_total[5m])"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Novos Clientes",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
+      "targets": [
+        {
+          "expr": "rate(icimento_user_service_total_customers_total[5m])"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Novos Lojistas",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
+      "targets": [
+        {
+          "expr": "rate(icimento_user_service_total_store_owners_total[5m])"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "% Clientes Ativos",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "expr": "100 * (icimento_user_service_total_active_customers / (icimento_user_service_total_active_customers + icimento_user_service_total_inactive_customers))"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "% Lojistas Ativos",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "expr": "100 * (icimento_user_service_total_active_store_owners / (icimento_user_service_total_active_store_owners + icimento_user_service_total_inactive_store_owners))"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "icimento",
+    "spring-boot",
+    "business",
+    "user-service"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {
+          "text": "Prometheus",
+          "value": "prometheus"
+        },
+        "label": "Prometheus datasource",
+        "hide": 0
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m"
+    ]
+  },
+  "timezone": "browser",
+  "title": "ICimento - User Service - Business Dashboard",
+  "uid": "icimento-user-business",
+  "version": 1,
+  "weekStart": ""
+}

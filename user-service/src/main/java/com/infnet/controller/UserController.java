@@ -4,6 +4,7 @@ import com.infnet.dtos.*;
 import com.infnet.model.CustomerProfile;
 import com.infnet.model.User;
 import com.infnet.model.enums.Role;
+import com.infnet.model.enums.Status;
 import com.infnet.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -76,7 +77,22 @@ public class UserController {
             @PathVariable("customerId") Long id){
         CustomerProfile customer = service.getCustomerById(authHeader, id);
         return ResponseEntity.ok().body(CustomerResponseDTO.toCustomerResponseDTO(customer));
+    }
 
+    @PutMapping("/deactivate/{userId}")
+    public ResponseEntity<Void> deactivateUser(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("userId") Long id) {
+        service.updateUserStatus(authHeader,id, Status.INACTIVE);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/activate/{userId}")
+    public ResponseEntity<Void> activateUser(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("userId") Long id) {
+        service.updateUserStatus(authHeader,id, Status.ACTIVE);
+        return ResponseEntity.ok().build();
     }
 
 

@@ -35,3 +35,5 @@ eureka:
   instance:
     instance-id: ${spring.application.name}:${random.value}
 
+security:
+  public-key: classpath:keys/public_key.pem

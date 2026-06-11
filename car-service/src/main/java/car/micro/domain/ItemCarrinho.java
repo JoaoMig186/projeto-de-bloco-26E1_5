@@ -1,8 +1,10 @@
 package car.micro.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -17,43 +19,35 @@ public class ItemCarrinho {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private Long produtoId;
-
-    @Column(nullable = false)
     private Long lojaId;
-
-    @Column(nullable = false)
     private String nomeProduto;
-
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
-
-    @Column(nullable = false)
     private Integer quantidade;
-
+    private BigDecimal subtotal;
     private Double peso;
-
-    private Boolean fragil = false;
-
+    private Boolean fragil;
     private String cepLoja;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal subtotal = BigDecimal.ZERO;
-
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrinho_id")
     private Carrinho carrinho;
 
+    public void calcularSubtotal() {
+
+        if (preco == null || quantidade == null) {
+            subtotal = BigDecimal.ZERO;
+            return;
+        }
+
+        subtotal = preco.multiply(
+                BigDecimal.valueOf(quantidade)
+        );
+    }
+
     @PrePersist
     @PreUpdate
-    public void calcularSubtotal() {
-        if (preco != null && quantidade != null) {
-            subtotal = preco.multiply(BigDecimal.valueOf(quantidade));
-        } else {
-            subtotal = BigDecimal.ZERO;
-        }
+    public void preSave() {
+        calcularSubtotal();
     }
 }

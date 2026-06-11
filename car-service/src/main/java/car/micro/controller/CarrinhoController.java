@@ -1,17 +1,12 @@
 package car.micro.controller;
 
 import car.micro.DTO.request.AdicionarItemDTO;
-import car.micro.DTO.response.DeliveryResponseDTO;
-import car.micro.DTO.response.PaymentResponseDTO;
 import car.micro.domain.Carrinho;
-import car.micro.domain.ItemCarrinho;
 import car.micro.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/carrinhos")
@@ -20,11 +15,13 @@ public class CarrinhoController {
 
     private final CarrinhoService service;
 
-    @PostMapping("/usuario/{usuarioId}")
+    @PostMapping
     public ResponseEntity<Carrinho> criar(
-            @PathVariable Long usuarioId
+            @RequestHeader("X-User-Id") Long usuarioId
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(service.criarCarrinho(usuarioId));
     }
 
@@ -32,7 +29,10 @@ public class CarrinhoController {
     public ResponseEntity<Carrinho> buscar(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(service.buscarCarrinho(id));
+
+        return ResponseEntity.ok(
+                service.buscarCarrinho(id)
+        );
     }
 
     @PostMapping("/{id}/itens")
@@ -40,6 +40,7 @@ public class CarrinhoController {
             @PathVariable Long id,
             @RequestBody AdicionarItemDTO dto
     ) {
+
         return ResponseEntity.ok(
                 service.adicionarItem(id, dto)
         );
@@ -50,6 +51,7 @@ public class CarrinhoController {
             @PathVariable Long id,
             @PathVariable Long itemId
     ) {
+
         return ResponseEntity.ok(
                 service.removerItem(id, itemId)
         );
@@ -59,28 +61,19 @@ public class CarrinhoController {
     public ResponseEntity<Carrinho> limpar(
             @PathVariable Long id
     ) {
+
         return ResponseEntity.ok(
                 service.limparCarrinho(id)
         );
     }
 
-    @GetMapping("/{id}/delivery")
-    public ResponseEntity<DeliveryResponseDTO> calcularFrete(
-            @PathVariable Long id,
-            @RequestParam String cepEntrega
+    @PostMapping("/{id}/checkout")
+    public ResponseEntity<Carrinho> iniciarCheckout(
+            @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                service.calcularFrete(id, cepEntrega)
-        );
-    }
 
-    @PostMapping("/{id}/pagamento")
-    public ResponseEntity<PaymentResponseDTO> realizarPagamento(
-            @PathVariable Long id,
-            @RequestParam BigDecimal frete
-    ) {
         return ResponseEntity.ok(
-                service.realizarPagamento(id, frete)
+                service.iniciarCheckout(id)
         );
     }
 }
