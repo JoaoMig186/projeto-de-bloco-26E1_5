@@ -19,6 +19,7 @@
         <module>review-service</module>
         <module>delivery-service</module>
         <module>car-service</module>
+        <module>search-service</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
