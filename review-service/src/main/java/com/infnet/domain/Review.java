@@ -27,11 +27,17 @@ public class Review {
     @Column(nullable = false)
     private Integer rating;
 
-    @Column(length = 500)
+    @Column(name = "author_comment", length = 500)
     private String comment;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "store_reply", length = 500)
+    private String ownerReply;
+
+    @Column(name = "reply_at")
+    private LocalDateTime ownerReplyAt;
 
     protected Review() {}
 

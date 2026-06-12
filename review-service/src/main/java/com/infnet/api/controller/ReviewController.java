@@ -1,5 +1,6 @@
 package com.infnet.api.controller;
 
+import com.infnet.api.dto.CreateReplyRequest;
 import com.infnet.api.dto.CreateReviewRequest;
 import com.infnet.api.dto.ReviewResponse;
 import com.infnet.api.dto.StoreReviewSummaryResponse;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/reviews")
@@ -22,9 +24,22 @@ public class ReviewController {
     @PostMapping("/store/{storeId}")
     public ResponseEntity<ReviewResponse> create(
             @PathVariable("storeId") Long storeId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Id") Long authorId,
+            @RequestHeader("X-User-Name") String authorName,
             @RequestBody @Valid CreateReviewRequest request) {
-        Review review = service.create(request, storeId, 1L, "João Pedro");
+        Review review = service.create(request, storeId, role, authorId, authorName);
         return ResponseEntity.status(HttpStatus.CREATED).body(ReviewResponse.toResponse(review));
+    }
+
+    @PostMapping("/{reviewId}/reply")
+    public ResponseEntity<ReviewResponse> reply(
+            @PathVariable("reviewId") UUID reviewId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody @Valid CreateReplyRequest request) {
+        Review review = service.reply(reviewId, request, role, userId);
+        return ResponseEntity.ok(ReviewResponse.toResponse(review));
     }
 
     @GetMapping("/store/{storeId}")

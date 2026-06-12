@@ -8,7 +8,7 @@ services:
       - "8761:8761"
 
     networks:
-      - microservices-network
+      - icimento-network
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
@@ -25,7 +25,7 @@ services:
       - "9999:9999"
 
     networks:
-      - microservices-network
+      - icimento-network
 
     depends_on:
       discovery-server:
@@ -37,7 +37,7 @@ services:
     container_name: user-service
 
     networks:
-      - microservices-network
+      - icimento-network
 
     depends_on:
       discovery-server:
@@ -45,13 +45,13 @@ services:
       postgres:
         condition: service_healthy
 
-  # USER SERVICE
+  # GEOCODE-FAKE-SERVICE
   geocode-fake-service:
     build: ../geocode-fake-service
     container_name: geocode-fake-service
 
     networks:
-      - microservices-network
+      - icimento-network
 
     depends_on:
       discovery-server:
@@ -63,7 +63,7 @@ services:
     container_name: store-service
 
     networks:
-      - microservices-network
+      - icimento-network
 
     depends_on:
       discovery-server:
@@ -77,14 +77,30 @@ services:
     container_name: review-service
 
     networks:
-      - microservices-network
+      - icimento-network
 
     depends_on:
       discovery-server:
         condition: service_healthy
       postgres:
         condition: service_healthy
+  # CAR SERVICE
+  cart-service:
+    build: ../car-service
+    container_name: car-service
 
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      postgres:
+        condition: service_healthy
+
+      kafka:
+        condition: service_healthy
   # POSTGRES
   postgres:
     image: postgres:17
@@ -96,18 +112,19 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
-      - postgres_data:/var/lib/postgresql/data
+      - icimento-postgres-data:/var/lib/postgresql/data
     networks:
-      - microservices-network
+      - icimento-network
 
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
+  # KAFKA
   kafka:
     image: apache/kafka:4.1.0
-    container_name: microservices-kafka
+    container_name: icimento-kafka
     ports:
       - "9092:9092"
     environment:
@@ -134,23 +151,62 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    volumes:
+      - icimento-kafka-data:/var/lib/kafka/data
     networks:
-      - microservices-network
+      - icimento-network
+
   kafka-ui:
       image: provectuslabs/kafka-ui:latest
-      container_name: microservices-kafka-ui
+      container_name: icimento-kafka-ui
       depends_on:
         kafka:
           condition: service_healthy
       ports:
         - "8085:8080"
       environment:
-        KAFKA_CLUSTERS_0_NAME: microservices-local
+        KAFKA_CLUSTERS_0_NAME: icimento-local
         KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       networks:
-        - microservices-network
+        - icimento-network
+
+  # PROMETHEUS
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: icimento-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - icimento-prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    networks:
+      - icimento-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: icimento-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - icimento-grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - icimento-network
+
+
 volumes:
-  postgres_data:
+  icimento-postgres-data:
+  icimento-kafka-data:
+  icimento-prometheus-data:
+  icimento-grafana-data:
 
 networks:
-  microservices-network:
+  icimento-network:

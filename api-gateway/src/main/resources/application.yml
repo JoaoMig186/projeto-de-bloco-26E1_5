@@ -17,6 +17,7 @@ spring:
               uri: lb://REVIEW-SERVICE
               predicates:
                 - Path=/reviews/**
+                - Method=GET
 
             #- id: store
             #  uri: lb://STORE
@@ -34,3 +35,5 @@ eureka:
   instance:
     instance-id: ${spring.application.name}:${random.value}
 
+security:
+  public-key: classpath:keys/public_key.pem

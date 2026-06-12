@@ -1,7 +1,10 @@
 package com.infnet.kafka;
 
 import com.infnet.events.CustomerCreatedEvent;
+import com.infnet.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaService {
     private final KafkaTemplate<String, CustomerCreatedEvent> kafkaTemplate;
+    private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
+
 
     private void sendEvent(CustomerCreatedEvent event){
-        kafkaTemplate.send("microservices.customer.created",
+        kafkaTemplate.send("icimento.customer.created",
                 String.valueOf(event.eventId()),
                 event
         );
@@ -20,7 +25,7 @@ public class KafkaService {
     public void sendCustomerCreatedEvent(Long userId, String address){
         CustomerCreatedEvent event = CustomerCreatedEvent.createEvent(userId, address);
         sendEvent(event);
-        System.out.println("EVENTO CUSTOMER CREATED ENVIADO!");
+        log.info("Evento de Criação de Cliente Enviado com Sucesso");
     }
 
 

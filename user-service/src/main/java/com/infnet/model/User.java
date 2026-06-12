@@ -1,6 +1,7 @@
 package com.infnet.model;
 
 import com.infnet.model.enums.Role;
+import com.infnet.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -46,5 +50,6 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.status = Status.ACTIVE;
     }
 }
