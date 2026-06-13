@@ -3,9 +3,12 @@ package com.infnet.service;
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.ProductSyncDTO;
+import com.infnet.kafka.KafkaService; // Importar o KafkaService
+import com.infnet.metrics.StoreMetrics;
 import com.infnet.model.Product;
 import com.infnet.model.Store;
 import com.infnet.model.enums.Category;
+import com.infnet.model.enums.Durability;
 import com.infnet.repository.ProductRepository;
 import com.infnet.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +24,11 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
-
-    // Injetaríamos aqui o nosso produtor de mensagens (ex: RabbitTemplate)
-    // private final RabbitTemplate rabbitTemplate;
+    private final KafkaService kafkaService; // Injetar o serviço Kafka
+    private final StoreMetrics storeMetrics; // Injetar a métrica
 
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO dto) {
-        // Verifica se a loja existe antes de adicionar o produto
         Store store = storeRepository.findById(dto.storeId())
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada para associar o produto."));
 
@@ -37,12 +38,15 @@ public class ProductService {
         product.setPrice(dto.price());
         product.setStockQuantity(dto.stockQuantity());
         product.setCategory(Category.valueOf(dto.category()));
+        product.setDurability(Durability.valueOf(dto.durability()));
         product.setStore(store);
 
         product = productRepository.save(product);
 
-        // TODO: Sincronizar com o search-service para a busca fuzzy e geolocalizada
+        // Sincronizando com o search-service
         syncWithSearchService(product, store);
+
+        storeMetrics.incrementProductCreation();
 
         return new ProductResponseDTO(product);
     }
@@ -54,7 +58,6 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    // Método interno para preparar o envio de dados ao Elastic Search
     private void syncWithSearchService(Product product, Store store) {
         ProductSyncDTO syncDTO = new ProductSyncDTO(
                 product.getId(),
@@ -64,10 +67,9 @@ public class ProductService {
                 store.getId(),
                 store.getName(),
                 store.getLatitude(),
-                store.getLongitude() // Dados vitais para a geolocalização no Elastic Search
+                store.getLongitude()
         );
 
-        // Exemplo: rabbitTemplate.convertAndSend("product.exchange", "product.routing.key", syncDTO);
-        System.out.println("Sincronizando com Search-Service: " + syncDTO);
+        kafkaService.sendProductSyncEvent(syncDTO); // Disparando o evento Kafka
     }
 }
