@@ -8,6 +8,12 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
+  kafka:
+    bootstrap-servers: kafka:29092 # Ou localhost:9092 se rodar localmente fora do docker
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 jpa:
   hibernate:
     ddl-auto: update
@@ -22,3 +28,21 @@ eureka:
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name} # Isso ajuda a filtrar no Grafana depois
+  tracing:
+    sampling:
+      probability: 1.0 # Define a amostragem para 100% (útil para desenvolvimento, regista todas as requisições)
+    zipkin:
+      tracing:
+        endpoint: "http://zipkin:9411/api/v2/spans" # URL do contentor Zipkin no seu docker-compose

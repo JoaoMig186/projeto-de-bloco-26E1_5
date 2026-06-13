@@ -1,6 +1,7 @@
 package com.infnet.model;
 
 import com.infnet.model.enums.Category;
+import com.infnet.model.enums.Durability;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +35,10 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category; // Ex: "Pisos", "Cimentos", "Ferragens", conforme o PDF de Objetivo
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Durability durability;
 
     // Muitos produtos pertencem a uma única loja
     @ManyToOne(fetch = FetchType.LAZY)
