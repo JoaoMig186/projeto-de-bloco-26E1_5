@@ -1,7 +1,7 @@
 package com.infnet.service.freight.strategy;
 
 import com.infnet.domain.entity.enums.VehicleType;
-import com.infnet.dto.request.Freight.FreightResponseDTO;
+import com.infnet.dto.request.freight.FreightResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component

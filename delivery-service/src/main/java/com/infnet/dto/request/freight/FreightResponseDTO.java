@@ -1,4 +1,4 @@
-package com.infnet.dto.request.Freight;
+package com.infnet.dto.request.freight;
 
 import com.infnet.domain.entity.enums.VehicleType;
 
