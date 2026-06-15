@@ -1,5 +1,6 @@
 package car.micro.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class ItemCarrinho {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrinho_id")
+    @JsonIgnore
     private Carrinho carrinho;
 
     public void calcularSubtotal() {

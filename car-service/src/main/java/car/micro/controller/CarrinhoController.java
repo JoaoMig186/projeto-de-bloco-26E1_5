@@ -1,6 +1,6 @@
 package car.micro.controller;
 
-import car.micro.DTO.request.AdicionarItemDTO;
+import car.micro.DTO.AdicionarItemDTO;
 import car.micro.domain.Carrinho;
 import car.micro.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
@@ -27,53 +27,58 @@ public class CarrinhoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Carrinho> buscar(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long usuarioId
     ) {
 
         return ResponseEntity.ok(
-                service.buscarCarrinho(id)
+                service.buscarCarrinho(id, usuarioId)
         );
     }
 
     @PostMapping("/{id}/itens")
     public ResponseEntity<Carrinho> adicionarItem(
             @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long usuarioId,
             @RequestBody AdicionarItemDTO dto
     ) {
 
         return ResponseEntity.ok(
-                service.adicionarItem(id, dto)
+                service.adicionarItem(id, usuarioId, dto)
         );
     }
 
     @DeleteMapping("/{id}/itens/{itemId}")
     public ResponseEntity<Carrinho> removerItem(
             @PathVariable Long id,
-            @PathVariable Long itemId
+            @PathVariable Long itemId,
+            @RequestHeader("X-User-Id") Long usuarioId
     ) {
 
         return ResponseEntity.ok(
-                service.removerItem(id, itemId)
+                service.removerItem(id, usuarioId, itemId)
         );
     }
 
     @DeleteMapping("/{id}/limpar")
     public ResponseEntity<Carrinho> limpar(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long usuarioId
     ) {
 
         return ResponseEntity.ok(
-                service.limparCarrinho(id)
+                service.limparCarrinho(id, usuarioId)
         );
     }
 
-    @PostMapping("/{id}/checkout")
-    public ResponseEntity<Carrinho> iniciarCheckout(
-            @PathVariable Long id
+    @PostMapping("/{id}/order")
+    public ResponseEntity<Carrinho> order(
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long usuarioId
     ) {
 
         return ResponseEntity.ok(
-                service.iniciarCheckout(id)
+                service.iniciarPagamento(id, usuarioId)
         );
     }
 }

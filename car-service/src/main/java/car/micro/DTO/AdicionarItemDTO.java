@@ -1,11 +1,7 @@
-package car.micro.DTO.request;
-
+package car.micro.DTO;
 
 public record AdicionarItemDTO(
-
         Long produtoId,
-
         Integer quantidade
-
 ) {
 }
