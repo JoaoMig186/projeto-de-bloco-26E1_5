@@ -7,5 +7,6 @@ public record ProdutoDTO(
         String nome,
         BigDecimal preco,
         Double peso,
-        Boolean fragil
+        Boolean fragil,
+        LojaDTO loja
 ) {}

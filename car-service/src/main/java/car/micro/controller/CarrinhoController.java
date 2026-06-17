@@ -1,6 +1,7 @@
 package car.micro.controller;
 
 import car.micro.DTO.AdicionarItemDTO;
+import car.micro.DTO.PagamentoIniciadoEvent;
 import car.micro.domain.Carrinho;
 import car.micro.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
@@ -71,14 +72,12 @@ public class CarrinhoController {
         );
     }
 
-    @PostMapping("/{id}/order")
-    public ResponseEntity<Carrinho> order(
-            @PathVariable Long id,
+    @GetMapping("/order")
+    public ResponseEntity<PagamentoIniciadoEvent> order(
             @RequestHeader("X-User-Id") Long usuarioId
     ) {
-
         return ResponseEntity.ok(
-                service.iniciarPagamento(id, usuarioId)
+                service.buscarDadosPagamento( usuarioId)
         );
     }
 }

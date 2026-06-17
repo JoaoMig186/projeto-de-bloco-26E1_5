@@ -1,5 +1,7 @@
 package car.micro.DTO.response;
 
+import car.micro.DTO.mock.LojaDTO;
+
 import java.math.BigDecimal;
 public record ItemCarrinhoResponseDTO(
         Long itemId,
@@ -8,5 +10,5 @@ public record ItemCarrinhoResponseDTO(
         Integer quantidade,
         Double peso,
         Boolean fragil,
-        String cepLoja
+        LojaDTO loja
 ) {}

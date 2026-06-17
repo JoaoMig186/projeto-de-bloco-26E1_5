@@ -22,13 +22,17 @@ public class ItemCarrinho {
     private Long id;
     private Long produtoId;
     private Long lojaId;
+
     private String nomeProduto;
     private BigDecimal preco;
     private Integer quantidade;
     private BigDecimal subtotal;
     private Double peso;
     private Boolean fragil;
-    private String cepLoja;
+    private String nomeLoja;
+    private Double latitude;
+    private Double longitude;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrinho_id")
@@ -36,15 +40,12 @@ public class ItemCarrinho {
     private Carrinho carrinho;
 
     public void calcularSubtotal() {
-
         if (preco == null || quantidade == null) {
             subtotal = BigDecimal.ZERO;
             return;
         }
 
-        subtotal = preco.multiply(
-                BigDecimal.valueOf(quantidade)
-        );
+        subtotal = preco.multiply(BigDecimal.valueOf(quantidade));
     }
 
     @PrePersist

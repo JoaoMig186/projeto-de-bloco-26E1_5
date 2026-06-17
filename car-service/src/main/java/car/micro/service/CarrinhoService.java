@@ -6,32 +6,23 @@ import car.micro.DTO.mock.LojaDTO;
 import car.micro.DTO.mock.ProdutoDTO;
 import car.micro.DTO.mock.UsuarioDTO;
 import car.micro.DTO.response.ItemCarrinhoResponseDTO;
-import car.micro.client.OrderClient;
 import car.micro.domain.Carrinho;
 import car.micro.domain.ENUM.StatusCarrinho;
 import car.micro.domain.ItemCarrinho;
 import car.micro.metrics.CarrinhoMetrics;
 import car.micro.repository.CarrinhoRepository;
-import car.micro.service.mock.LojaClientMock;
-import car.micro.service.mock.OrderClientMock;
 import car.micro.service.mock.ProdutoClientMock;
 import car.micro.service.mock.UsuarioClientMock;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class CarrinhoService {
     private final CarrinhoMetrics metrics;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final CarrinhoRepository repository;
     private final UsuarioClientMock usuarioClientMock;
     private final ProdutoClientMock produtoClientMock;
-    private final LojaClientMock lojaClientMock;
-    private final OrderClientMock orderClient;
 
     public Carrinho criarCarrinho(Long usuarioId) {
         UsuarioDTO usuario = usuarioClientMock.buscarUsuario(usuarioId);
@@ -58,17 +49,25 @@ public class CarrinhoService {
 
     public Carrinho adicionarItem(Long carrinhoId, Long usuarioId, AdicionarItemDTO dto) {
         Carrinho carrinho = buscarCarrinho(carrinhoId, usuarioId);
-
         if (carrinho.getStatus() != StatusCarrinho.ABERTO) {
             throw new RuntimeException("Carrinho não pode ser alterado");
         }
-
         ProdutoDTO produto = produtoClientMock.buscarProduto(dto.produtoId());
+
         if (produto == null) {
             throw new RuntimeException("Produto não encontrado");
         }
 
-        LojaDTO loja = lojaClientMock.buscarLoja(1L);
+        LojaDTO loja = produto.loja();
+        /*
+        ProdutoDTO produto = produtoClient.buscarProduto(dto.produtoId());
+
+        if (produto == null) {
+            throw new RuntimeException("Produto não encontrado");
+        }
+
+        LojaDTO loja = lojaClient.buscarLoja(produto.lojaId());
+        */
         ItemCarrinho item = new ItemCarrinho();
         item.setProdutoId(produto.id());
         item.setLojaId(loja.id());
@@ -77,10 +76,10 @@ public class CarrinhoService {
         item.setQuantidade(dto.quantidade());
         item.setPeso(produto.peso());
         item.setFragil(produto.fragil());
-        item.setCepLoja(loja.cep());
+        item.setLatitude(loja.latitude());
+        item.setLongitude(loja.longitude());
         item.setCarrinho(carrinho);
         item.calcularSubtotal();
-
         carrinho.getItens().add(item);
         carrinho.calcularTotal();
 
@@ -105,39 +104,35 @@ public class CarrinhoService {
         return repository.save(carrinho);
     }
 
-    public Carrinho iniciarPagamento(Long carrinhoId, Long usuarioId) {
-        Carrinho carrinho = buscarCarrinho(carrinhoId, usuarioId);
+    public PagamentoIniciadoEvent buscarDadosPagamento(Long usuarioId) {
+        Carrinho carrinho = repository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
 
         if (carrinho.getItens().isEmpty()) {
             throw new RuntimeException("Carrinho vazio");
         }
 
-        PagamentoIniciadoEvent dto = new PagamentoIniciadoEvent(
+        return new PagamentoIniciadoEvent(
                 carrinho.getId(),
                 carrinho.getUsuarioId(),
                 carrinho.getTotal(),
-                carrinho.getItens().stream().map(item -> new ItemCarrinhoResponseDTO(
-                        item.getId(),
-                        item.getLojaId(),
-                        item.getNomeProduto(),
-                        item.getQuantidade(),
-                        item.getPeso(),
-                        item.getFragil(),
-                        item.getCepLoja()
-                )).toList()
+                carrinho.getItens()
+                        .stream()
+                        .map(item -> new ItemCarrinhoResponseDTO(
+                                item.getId(),
+                                item.getLojaId(),
+                                item.getNomeProduto(),
+                                item.getQuantidade(),
+                                item.getPeso(),
+                                item.getFragil(),
+                                new LojaDTO(
+                                        item.getLojaId(),
+                                        item.getNomeLoja(),
+                                        item.getLatitude(),
+                                        item.getLongitude()
+                                )
+                        ))
+                        .toList()
         );
-
-        orderClient.criarPedido(dto);
-
-        carrinho.setStatus(StatusCarrinho.ENVIADOPARAPAGAMENTO);
-        repository.save(carrinho);
-
-        redisTemplate.opsForValue().set(
-                "cart:" + carrinho.getId(),
-                carrinho,
-                Duration.ofMinutes(30)
-        );
-
-        return carrinho;
     }
 }
