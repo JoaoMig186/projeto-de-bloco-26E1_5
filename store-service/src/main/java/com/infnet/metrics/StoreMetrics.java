@@ -1,21 +1,24 @@
 package com.infnet.metrics;
 
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StoreMetrics {
 
-    private final Counter productCreationCounter;
+    private final MeterRegistry registry;
 
     public StoreMetrics(MeterRegistry registry) {
-        this.productCreationCounter = Counter.builder("product_creation_total")
-                .description("Total de produtos criados e sincronizados na loja")
-                .register(registry);
+        this.registry = registry;
     }
 
-    public void incrementProductCreation() {
-        productCreationCounter.increment();
+    // Recebe a categoria para criar uma "Tag"
+    public void incrementProductCreation(String category) {
+        registry.counter("product_creation_total", "category", category).increment();
+    }
+
+    public void recordKafkaSyncTime(long milliseconds) {
+        registry.timer("kafka_product_sync_time_ms")
+                .record(java.time.Duration.ofMillis(milliseconds));
     }
 }

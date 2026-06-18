@@ -3,7 +3,7 @@ package com.infnet.service;
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.ProductSyncDTO;
-import com.infnet.kafka.KafkaService; // Importar o KafkaService
+import com.infnet.kafka.KafkaService;
 import com.infnet.metrics.StoreMetrics;
 import com.infnet.model.Product;
 import com.infnet.model.Store;
@@ -24,8 +24,8 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
-    private final KafkaService kafkaService; // Injetar o serviço Kafka
-    private final StoreMetrics storeMetrics; // Injetar a métrica
+    private final KafkaService kafkaService;
+    private final StoreMetrics storeMetrics;
 
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO dto) {
@@ -37,7 +37,11 @@ public class ProductService {
         product.setDescription(dto.description());
         product.setPrice(dto.price());
         product.setStockQuantity(dto.stockQuantity());
-        product.setCategory(Category.valueOf(dto.category()));
+
+        // Blindagem aplicada apenas na categoria (converte qualquer entrada para maiúsculas)
+        product.setCategory(Category.valueOf(dto.category().toUpperCase()));
+
+        // Durabilidade continua com formatação estrita
         product.setDurability(Durability.valueOf(dto.durability()));
         product.setStore(store);
 
@@ -46,7 +50,7 @@ public class ProductService {
         // Sincronizando com o search-service
         syncWithSearchService(product, store);
 
-        storeMetrics.incrementProductCreation();
+        storeMetrics.incrementProductCreation(product.getCategory().name());;
 
         return new ProductResponseDTO(product);
     }
@@ -59,6 +63,7 @@ public class ProductService {
     }
 
     private void syncWithSearchService(Product product, Store store) {
+        long startTime = System.currentTimeMillis();
         ProductSyncDTO syncDTO = new ProductSyncDTO(
                 product.getId(),
                 product.getName(),
@@ -70,6 +75,9 @@ public class ProductService {
                 store.getLongitude()
         );
 
-        kafkaService.sendProductSyncEvent(syncDTO); // Disparando o evento Kafka
+        kafkaService.sendProductSyncEvent(syncDTO);
+
+        long endTime = System.currentTimeMillis();
+        storeMetrics.recordKafkaSyncTime(endTime - startTime);
     }
 }
