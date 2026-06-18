@@ -26,6 +26,7 @@ public class StoreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
     }
 
+
     // Endpoint para listar as lojas disponíveis (para clientes ou integradores)
     @GetMapping
     public ResponseEntity<List<StoreResponseDTO>> getAllActiveStores() {

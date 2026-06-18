@@ -2,6 +2,7 @@ package com.infnet.controller;
 
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
+import com.infnet.model.outbox.OutboxProductEvent;
 import com.infnet.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,4 +31,11 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDTO>> getProductsByStore(@PathVariable Long storeId) {
         return ResponseEntity.ok(productService.getProductsByStore(storeId));
     }
+
+    //TESTE APAGAR DPS
+    @GetMapping("/events")
+    public ResponseEntity<List<OutboxProductEvent>> getEvents(){
+        return ResponseEntity.ok(productService.getEvents());
+    }
+
 }

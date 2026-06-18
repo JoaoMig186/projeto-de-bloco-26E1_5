@@ -33,7 +33,7 @@ public class UserService {
     private PasswordEncoder encoder;
     private JwtService jwtService;
     private CustomerProfileRepository customerRepository;
-    private GeocodeService geocodeService;
+    private KafkaService kafkaService;
     private UserMetrics metrics;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -71,7 +71,7 @@ public class UserService {
         metrics.incrementTotalCustomers();
         metrics.incrementTotalPendingGeocodeCustomers();
 
-        geocodeService.getCustomerGeocode(user.getId(),address);
+        kafkaService.sendCustomerCreatedEvent(user.getId(),address);
         customerRepository.save(customer);
     }
 
