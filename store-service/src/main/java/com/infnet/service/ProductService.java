@@ -1,5 +1,6 @@
 package com.infnet.service;
 
+import com.infnet.dtos.OrderProductInfoDTO;
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.ProductSyncDTO;
@@ -37,6 +38,7 @@ public class ProductService {
         product.setDescription(dto.description());
         product.setPrice(dto.price());
         product.setStockQuantity(dto.stockQuantity());
+        product.setWeight(dto.weight());
 
         // Blindagem aplicada apenas na categoria (converte qualquer entrada para maiúsculas)
         product.setCategory(Category.valueOf(dto.category().toUpperCase()));
@@ -50,7 +52,7 @@ public class ProductService {
         // Sincronizando com o search-service
         syncWithSearchService(product, store);
 
-        storeMetrics.incrementProductCreation(product.getCategory().name());;
+        storeMetrics.incrementProductCreation(product.getCategory().name());
 
         return new ProductResponseDTO(product);
     }
@@ -60,6 +62,32 @@ public class ProductService {
                 .stream()
                 .map(ProductResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    public OrderProductInfoDTO getProductInfoForOrder(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+        Store store = product.getStore();
+
+        // Verifica a durabilidade
+        boolean isFragile = product.getDurability() == Durability.FRAGIL;
+
+        OrderProductInfoDTO.StoreDTO storeDTO = new OrderProductInfoDTO.StoreDTO(
+                store.getId(),
+                store.getName(),
+                store.getLatitude(),
+                store.getLongitude()
+        );
+
+        return new OrderProductInfoDTO(
+                product.getId(),
+                store.getId(),
+                product.getName(),
+                product.getWeight(),
+                isFragile,
+                storeDTO
+        );
     }
 
     private void syncWithSearchService(Product product, Store store) {

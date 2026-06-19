@@ -27,6 +27,10 @@ public record ProductRequestDTO(
         @NotBlank(message = "A durabilidade é obrigatória (ex: Frágil, Não Fragil)")
         String durability,
 
+        @NotNull(message = "O peso é obrigatório")
+        @DecimalMin(value = "0.0", message = "O peso não pode ser negativo")
+        Double weight,
+
         @NotNull(message = "O ID da loja é obrigatório")
         Long storeId
 ) {}

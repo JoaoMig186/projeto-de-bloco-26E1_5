@@ -1,9 +1,6 @@
 package com.infnet.controller;
 
-import com.infnet.dtos.ProductRequestDTO;
-import com.infnet.dtos.ProductResponseDTO;
-import com.infnet.dtos.StoreRequestDTO;
-import com.infnet.dtos.StoreResponseDTO;
+import com.infnet.dtos.*;
 import com.infnet.service.ProductService;
 import com.infnet.service.StoreService;
 import jakarta.validation.Valid;
@@ -56,5 +53,11 @@ public class StoreController {
     @GetMapping("/{storeId}/products")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByStore(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(productService.getProductsByStore(storeId));
+    }
+
+    // Endpoint para consumo interno do Order Service
+    @GetMapping("/products/{productId}/order-info")
+    public ResponseEntity<OrderProductInfoDTO> getProductInfoForOrder(@PathVariable("productId") Long productId) {
+        return ResponseEntity.ok(productService.getProductInfoForOrder(productId));
     }
 }
