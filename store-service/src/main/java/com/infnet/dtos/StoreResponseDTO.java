@@ -8,8 +8,6 @@ public record StoreResponseDTO(
         String cnpj,
         String address,
         String phone,
-        double longitude,
-        double latitude,
         boolean active
 ) {
     // Construtor prático para converter diretamente da Entidade para o DTO
@@ -20,8 +18,6 @@ public record StoreResponseDTO(
                 store.getCnpj(),
                 store.getAddress(),
                 store.getPhone(),
-                store.getLongitude(),
-                store.getLatitude(),
                 store.isActive()
         );
     }

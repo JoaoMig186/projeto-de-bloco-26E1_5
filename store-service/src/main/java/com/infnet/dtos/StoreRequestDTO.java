@@ -15,11 +15,5 @@ public record StoreRequestDTO(
         @NotBlank(message = "O endereço é obrigatório")
         String address,
 
-        @NotNull(message = "A latitude é obrigatória para a busca geolocalizada")
-        Double latitude,
-
-        @NotNull(message = "A longitude é obrigatória para a busca geolocalizada")
-        Double longitude,
-
         String phone
 ) {}

@@ -1,9 +1,12 @@
 package com.infnet.model.outbox;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.infnet.model.enums.ProductEventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
@@ -23,8 +26,9 @@ public class OutboxProductEvent {
     @Enumerated(EnumType.STRING)
     private ProductEventType eventType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String payload;
+    private JsonNode payload;
 
     private Boolean processed;
 
@@ -32,9 +36,10 @@ public class OutboxProductEvent {
 
     }
 
-    public OutboxProductEvent(Long productId, ProductEventType eventType, String payload){
+    public OutboxProductEvent(Long productId, ProductEventType eventType, JsonNode payload){
         this.productId = productId;
         this.eventType = eventType;
         this.payload = payload;
+        processed = false;
     }
 }

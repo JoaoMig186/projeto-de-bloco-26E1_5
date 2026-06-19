@@ -201,6 +201,18 @@ services:
     networks:
       - icimento-network
 
+  elasticsearch-db:
+    image: elasticsearch:8.19.2
+    container_name: elasticsearch-db
+    ports:
+      - "9201:9200"
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    restart: unless-stopped
+    networks:
+      - icimento-network
 
 volumes:
   icimento-postgres-data:

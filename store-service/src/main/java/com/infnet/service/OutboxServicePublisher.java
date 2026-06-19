@@ -17,17 +17,17 @@ public class OutboxServicePublisher {
     private final OutboxProductEventRepository outboxRepository;
     private final KafkaService kafkaService;
 
-//    @Scheduled(fixedDelay = 5000)
-//    @Transactional
-//    public void publishProductEvents(){
-//        List<OutboxProductEvent> events = outboxRepository.findByProcessedFalse();
-//
-//        for(OutboxProductEvent event : events){
-//            kafkaService.sendProductSyncEvent(
-//                    event.getPayload()
-//            );
-//            event.setProcessed(true);
-//        }
-//    }
+    @Scheduled(fixedDelay = 5000)
+    @Transactional
+    public void publishProductEvents(){
+        List<OutboxProductEvent> events = outboxRepository.findByProcessedFalse();
+
+        for(OutboxProductEvent event : events){
+            kafkaService.sendProductSyncEvent(
+                    String.valueOf(event.getPayload())
+            );
+            event.setProcessed(true);
+        }
+    }
 
 }

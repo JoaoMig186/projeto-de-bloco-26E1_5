@@ -28,10 +28,8 @@ public class Store {
     @Column(nullable = false)
     private String address; // Pode ser evoluído para uma entidade separada no futuro
 
-    @Column(nullable = false)
     private Double latitude;
 
-    @Column(nullable = false)
     private Double longitude;
 
     private String phone;
