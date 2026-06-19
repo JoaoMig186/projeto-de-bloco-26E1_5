@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -29,6 +30,7 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final DriverRepository driverRepository;
     private final FreightService freightService;
+    //private final DeliveryEventProducer producer;
 
     public DeliveryResponseDTO create(
             DeliveryRequestDTO dto
@@ -61,6 +63,7 @@ public class DeliveryService {
 
         driver.becomeUnavailable();
         deliveryRepository.save(delivery);
+        publishStatusChanged(delivery);
         return toResponse(delivery);
     }
 
@@ -89,6 +92,7 @@ public class DeliveryService {
                 findEntity(deliveryId);
 
         delivery.startDelivery();
+        publishStatusChanged(delivery);
         return toResponse(delivery);
     }
 
@@ -106,6 +110,7 @@ public class DeliveryService {
 
         driver.becomeAvailable();
         delivery.finishDelivery();
+        publishStatusChanged(delivery);
         return toResponse(delivery);
     }
 
@@ -125,6 +130,7 @@ public class DeliveryService {
             );
             driver.becomeAvailable();
         }
+        publishStatusChanged(delivery);
         return toResponse(delivery);
     }
 
@@ -161,5 +167,20 @@ public class DeliveryService {
                 delivery.getCreatedAt(),
                 delivery.getDeliveredAt()
         );
+    }
+
+    private void publishStatusChanged(
+            Delivery delivery
+    ) {
+
+        /*producer.publishStatusChanged(
+                new DeliveryStatusChangedEvent(
+                        delivery.getId(),
+                        delivery.getOrderId(),
+                        delivery.getDriverId(),
+                        delivery.getStatus(),
+                        LocalDateTime.now()
+                )
+        );*/
     }
 }
