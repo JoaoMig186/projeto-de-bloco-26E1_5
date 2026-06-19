@@ -101,6 +101,23 @@ services:
 
       kafka:
         condition: service_healthy
+  #DELIVERY SERVICE
+  delivery-service:
+    build: ../delivery-service
+    container_name: delivery-service
+
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      postgres:
+        condition: service_healthy
+
+      kafka:
+        condition: service_healthy
   # POSTGRES
   postgres:
     image: postgres:17
