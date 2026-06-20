@@ -33,7 +33,7 @@ public class DriverController {
 
     @GetMapping
     public ResponseEntity<Page<DriverResponseDTO>> toList(
-            @RequestParam(required = false) String name,
+            @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
