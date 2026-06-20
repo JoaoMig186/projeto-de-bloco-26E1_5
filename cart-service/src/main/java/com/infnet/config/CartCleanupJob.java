@@ -17,7 +17,7 @@ public class CartCleanupJob {
 
     private final CartRepository repository;
     private final CartMetrics metrics;
-    @Scheduled(fixedRate = 6000000)
+    @Scheduled(fixedRate = 600000)
     public void cleanExpiredCarts() {
 
         LocalDateTime cutoffTime =
