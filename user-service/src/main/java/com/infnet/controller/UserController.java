@@ -6,6 +6,7 @@ import com.infnet.model.User;
 import com.infnet.model.enums.Role;
 import com.infnet.model.enums.Status;
 import com.infnet.service.UserService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class UserController {
     private UserService service;
 
     @PostMapping("/login")
+    @RateLimiter(name = "loginLimiter")
     public String userAuthLogin(@RequestBody UserLoginDTO dto){
         return service.userAuthLogin(dto);
     }
@@ -36,18 +38,21 @@ public class UserController {
     }
 
     @PostMapping("/customer")
+    @RateLimiter(name = "registerLimiter")
     public ResponseEntity<UserResponseDTO> registerCustomer(@RequestBody @Valid UserRegisterDTO dto){
         User user = service.registerUser(dto, Role.CUSTOMER);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toResponseDTO(user));
     }
 
     @PostMapping("/store")
+    @RateLimiter(name = "registerLimiter")
     public ResponseEntity<UserResponseDTO> registerStoreOwner(@RequestBody @Valid UserRegisterDTO dto){
         User user = service.registerUser(dto, Role.STORE_OWNER);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toResponseDTO(user));
     }
 
     @PostMapping("/admin")
+    @RateLimiter(name = "registerLimiter")
     public ResponseEntity<UserResponseDTO> registerAdmin(@RequestBody @Valid UserRegisterDTO dto){
         User user = service.registerUser(dto, Role.ADMIN);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDTO.toResponseDTO(user));
@@ -79,6 +84,15 @@ public class UserController {
         return ResponseEntity.ok().body(CustomerResponseDTO.toCustomerResponseDTO(customer));
     }
 
+    @GetMapping("/{userId}/geocode")
+    public ResponseEntity<CustomerGeocodeDTO> getUserGeocode(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("userId") Long id
+    ){
+       CustomerProfile customer = service.getCustomerById(authHeader,id);
+        return ResponseEntity.ok().body(CustomerGeocodeDTO.fromDomain(customer));
+    }
+
     @PutMapping("/deactivate/{userId}")
     public ResponseEntity<Void> deactivateUser(
             @RequestHeader("Authorization") String authHeader,
@@ -94,6 +108,8 @@ public class UserController {
         service.updateUserStatus(authHeader,id, Status.ACTIVE);
         return ResponseEntity.ok().build();
     }
+
+
 
 
 }

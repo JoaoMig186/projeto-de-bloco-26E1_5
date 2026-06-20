@@ -29,8 +29,6 @@ public class StoreService {
         store.setCnpj(dto.cnpj());
         store.setAddress(dto.address());
         store.setPhone(dto.phone());
-        store.setLatitude(dto.latitude());
-        store.setLongitude(dto.longitude());
         store.setActive(true);
 
         store = storeRepository.save(store);

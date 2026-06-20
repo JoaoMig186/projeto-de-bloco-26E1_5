@@ -2,7 +2,7 @@ spring:
   application:
     name: user-service
   profiles:
-    active: prod
+    active: dev
 
 security:
   private-key: classpath:keys/private_key.pem
@@ -18,3 +18,16 @@ management:
 api:
   endpoints:
     GEOCODE-FAKE-SERVICE
+
+resilience4j:
+  ratelimiter:
+    instances:
+      loginLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 1m
+        timeoutDuration: 0
+
+      registerLimiter:
+        limitForPeriod: 3
+        limitRefreshPeriod: 1m
+        timeoutDuration: 0

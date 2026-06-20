@@ -2,10 +2,7 @@ package com.infnet.service;
 
 import com.infnet.dtos.UserLoginDTO;
 import com.infnet.dtos.UserRegisterDTO;
-import com.infnet.exception.AuthorizationException;
-import com.infnet.exception.EmailAlreadyRegisteredException;
-import com.infnet.exception.ForbiddenAuthorizationException;
-import com.infnet.exception.UserInactiveException;
+import com.infnet.exception.*;
 import com.infnet.kafka.KafkaService;
 import com.infnet.metrics.UserMetrics;
 import com.infnet.model.CustomerProfile;
@@ -33,7 +30,7 @@ public class UserService {
     private PasswordEncoder encoder;
     private JwtService jwtService;
     private CustomerProfileRepository customerRepository;
-    private GeocodeService geocodeService;
+    private KafkaService kafkaService;
     private UserMetrics metrics;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -71,7 +68,7 @@ public class UserService {
         metrics.incrementTotalCustomers();
         metrics.incrementTotalPendingGeocodeCustomers();
 
-        geocodeService.getCustomerGeocode(user.getId(),address);
+        kafkaService.sendCustomerCreatedEvent(user.getId(),address);
         customerRepository.save(customer);
     }
 
@@ -178,4 +175,8 @@ public class UserService {
         }
     }
 
+    public User getUserGeocode(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+    }
 }
