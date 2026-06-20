@@ -2,7 +2,8 @@ package com.infnet.config;
 
 import com.infnet.domain.Cart;
 import com.infnet.domain.ENUM.CartStatus;
-import com.infnet.repository.CarRepository;
+import com.infnet.metrics.CartMetrics;
+import com.infnet.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,8 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartCleanupJob {
 
-    private final CarRepository repository;
-
+    private final CartRepository repository;
+    private final CartMetrics metrics;
     @Scheduled(fixedRate = 6000000)
     public void cleanExpiredCarts() {
 
@@ -29,5 +30,6 @@ public class CartCleanupJob {
                 );
 
         repository.deleteAll(carts);
+        carts.forEach(cart -> metrics.incrementarCarrinhosFinalizados());
     }
 }

@@ -1,107 +1,115 @@
 package com.infnet.service;
 
 import com.infnet.DTO.*;
-
 import com.infnet.domain.Cart;
 import com.infnet.domain.ENUM.CartStatus;
 import com.infnet.domain.CartItem;
-import com.infnet.metrics.CarrinhoMetrics;
+import com.infnet.metrics.CartMetrics;
 import com.infnet.repository.CartRepository;
-import com.infnet.service.mock.ProdutoClientMock;
-import com.infnet.service.mock.UsuarioClientMock;
+import com.infnet.config.exception.BusinessException;
+import com.infnet.config.exception.ResourceNotFoundException;
+import com.infnet.config.exception.AccessDeniedException;
+import com.infnet.config.client.StoreClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CarService {
-    private final CarrinhoMetrics metrics;
+public class CartService {
+
+    private final CartMetrics metrics;
     private final CartRepository repository;
-    private final UsuarioClientMock usuarioClientMock;
-    private final ProdutoClientMock produtoClientMock;
+    private final StoreClient storeClient;
 
-    public Cart createCart(Long usuarioId) {
-        UserDTO usuario = usuarioClientMock.buscarUsuario(usuarioId);
-        if (usuario == null) {
-            throw new RuntimeException("Usuário não encontrado");
-        }
 
-        Cart carrinho = new Cart();
-        carrinho.setUserId(usuarioId);
-        carrinho.setStatus(CartStatus.OPEN);
+    public Cart createCart(Long userId) {
+        Cart cart = new Cart();
+        cart.setUserId(userId);
+        cart.setStatus(CartStatus.OPEN);
+
         metrics.incrementarCarrinhosCriados();
-        return repository.save(carrinho);
-    }
-    public Cart getCart(Long carrinhoId, Long usuarioId) {
-        Cart carrinho = repository.findById(carrinhoId)
-                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
-
-        if (!carrinho.getUserId().equals(usuarioId)) {
-            throw new RuntimeException("Acesso negado: Este carrinho não pertence ao usuário.");
-        }
-
-        return carrinho;
+        return repository.save(cart);
     }
 
-    public Cart addItem(Long carrinhoId, Long usuarioId, AddItemDTO dto) {
-        Cart carrinho = getCart(carrinhoId, usuarioId);
-        if (carrinho.getStatus() != CartStatus.OPEN) {
-            throw new RuntimeException("Carrinho não pode ser alterado");
-        }
-        ProductOrderInfoDTO produto = produtoClientMock.buscarProduto(dto.produtoId());
+    public Cart getCart(Long cartId, Long userId) {
+        Cart cart = repository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
 
-        if (produto == null) {
-            throw new RuntimeException("Produto não encontrado");
+        if (!cart.getUserId().equals(userId)) {
+            throw new AccessDeniedException("Access denied: This cart does not belong to the user.");
         }
 
-        StoreDTO loja = produto.store();
+        return cart;
+    }
+
+    public Cart addItem(Long cartId, Long userId, AddItemDTO dto) {
+        Cart cart = getCart(cartId, userId);
+        if (cart.getStatus() != CartStatus.OPEN) {
+            throw new BusinessException("Cart cannot be modified because it is not open.");
+        }
+        ProductOrderInfoDTO product = storeClient.getOrderInfo(dto.produtoId());
+        if (product == null) {
+            throw new ResourceNotFoundException("Product not found.");
+        }
+        StoreDTO store = product.store();
+
+        if (!cart.getItems().isEmpty()) {
+            Long currentStoreId = cart.getItems().get(0).getStoreId();
+
+            if (!currentStoreId.equals(store.id())) {
+                throw new BusinessException("Cannot add items from different stores to the same cart. Please clear your cart first.");
+            }
+        }
         CartItem item = new CartItem();
-        item.setProductId(produto.itemId());
-        item.setStoreId(loja.id());
-        item.setProductName(produto.productName());
-        item.setPrice(produto.preco());
+        item.setProductId(product.itemId());
+        item.setStoreId(store.id());
+        item.setProductName(product.productName());
+        item.setPrice(product.preco());
         item.setQuantity(dto.quantidade());
-        item.setWeight(produto.weight());
-        item.setFragile(produto.fragile());
-        item.setLatitude(loja.latitude());
-        item.setLongitude(loja.longitude());
+        item.setWeight(product.weight());
+        item.setFragile(product.fragile());
+        item.setLatitude(store.latitude());
+        item.setLongitude(store.longitude());
+
         item.calculateSubtotal();
-        carrinho.getItems().add(item);
-        carrinho.calculateTotal();
+        cart.getItems().add(item);
+        cart.calculateTotal();
+        cart.calculateTotalWeight();
 
-        return repository.save(carrinho);
+        return repository.save(cart);
     }
 
-    public Cart removeItem(Long carrinhoId, Long usuarioId, Long itemId) {
-        Cart carrinho = getCart(carrinhoId, usuarioId);
+    public Cart removeItem(Long cartId, Long userId, Long itemId) {
+        Cart cart = getCart(cartId, userId);
 
-        carrinho.getItems().removeIf(item -> item.getProductId().equals(itemId));
-        carrinho.calculateTotal();
-        return repository.save(carrinho);
+        cart.getItems().removeIf(item -> item.getProductId().equals(itemId));
+        cart.calculateTotal();
+
+        return repository.save(cart);
     }
 
-    public Cart clearCart(Long carrinhoId, Long usuarioId) {
-        Cart carrinho = getCart(carrinhoId, usuarioId);
+    public Cart clearCart(Long cartId, Long userId) {
+        Cart cart = getCart(cartId, userId);
 
-        carrinho.getItems().clear();
-        carrinho.calculateTotal();
+        cart.getItems().clear();
+        cart.calculateTotal();
 
-        return repository.save(carrinho);
+        return repository.save(cart);
     }
 
-    public PagamentoIniciadoEvent buscarDadosPagamento(Long usuarioId) {
-        Cart carrinho = repository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+    public PagamentoIniciadoEvent getPaymentData(Long userId) {
+        Cart cart = repository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
 
-        if (carrinho.getItems().isEmpty()) {
-            throw new RuntimeException("Carrinho vazio");
+        if (cart.getItems().isEmpty()) {
+            throw new BusinessException("Cart is empty.");
         }
 
         return new PagamentoIniciadoEvent(
-                carrinho.getId(),
-                carrinho.getTotal(),
-                carrinho.getTotalWeightKg(),
-                carrinho.getItems()
+                cart.getId(),
+                cart.getTotal(),
+                cart.getTotalWeightKg(),
+                cart.getItems()
                         .stream()
                         .map(item -> new CartItemResponseDTO(
                                 item.getProductId(),

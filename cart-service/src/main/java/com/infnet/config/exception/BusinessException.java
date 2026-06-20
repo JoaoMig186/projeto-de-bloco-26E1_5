@@ -1,4 +1,4 @@
-package com.infnet.exception;
+package com.infnet.config.exception;
 
 public class BusinessException extends RuntimeException {
     public BusinessException(String message) {

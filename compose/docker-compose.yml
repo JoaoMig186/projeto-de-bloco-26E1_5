@@ -84,10 +84,10 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-  # CAR SERVICE
+  # CART SERVICE
   cart-service:
-    build: ../car-service
-    container_name: car-service
+    build: ../cart-service
+    container_name: cart-service
 
     networks:
       - icimento-network

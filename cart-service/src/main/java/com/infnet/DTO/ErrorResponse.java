@@ -1,4 +1,4 @@
-package com.infnet.DTO.response;
+package com.infnet.DTO;
 import java.time.LocalDateTime;
 
 public record ErrorResponse(

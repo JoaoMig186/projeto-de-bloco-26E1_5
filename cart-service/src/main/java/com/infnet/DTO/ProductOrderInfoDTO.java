@@ -1,4 +1,4 @@
-package com.infnet.DTO.mock;
+package com.infnet.DTO;
 
 import java.math.BigDecimal;
 

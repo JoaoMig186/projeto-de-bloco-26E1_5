@@ -3,13 +3,13 @@ package com.infnet.DTO;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record CarrinhoResponseDTO(
+public record CartResponseDTO(
 
-        Long carrinhoId,
+        Long cartId,
 
-        Long usuarioId,
+        Long userId,
 
-        List<ItemCarrinhoResponseDTO> itens,
+        List<CartItemResponseDTO> items,
 
         BigDecimal total
 

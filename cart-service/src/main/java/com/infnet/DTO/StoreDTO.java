@@ -1,4 +1,4 @@
-package com.infnet.DTO.mock;
+package com.infnet.DTO;
 
 public record StoreDTO(
         Long id,

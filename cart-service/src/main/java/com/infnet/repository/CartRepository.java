@@ -9,12 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface CarRepository extends JpaRepository<Cart, Long> {
-    List<Cart> findByStatusAndDataAtualizacaoBefore(
-            CartStatus status,
-            LocalDateTime data
-    );
-    Optional<Cart> findByUsuarioId(Long usuarioId);
+public interface CartRepository extends JpaRepository<Cart, Long> {
+    Optional<Cart> findByUserId(Long usuarioId);
 
-    List<Cart> findByStatusAndUpdatedAtBefore(CartStatus cartStatus, LocalDateTime cutoffTime);
+    List<Cart> findByStatusAndUpdatedAtBefore(CartStatus status, LocalDateTime cutoffTime);
 }

@@ -11,24 +11,23 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CartItem {
 
-    private Long produtoId;
-    private Long lojaId;
-    private String nomeProduto;
-    private BigDecimal preco;
-    private Integer quantidade;
+    private Long productId;
+    private Long storeId;
+    private String productName;
+    private BigDecimal price;
+    private Integer quantity;
     private BigDecimal subtotal;
-    private Double peso;
-    private Boolean fragil;
-    private String nomeLoja;
+    private Double weight;
+    private Boolean fragile;
+    private String storeName;
     private Double latitude;
     private Double longitude;
 
-
-    public void calcularSubtotal() {
-        if (preco == null || quantidade == null) {
+    public void calculateSubtotal() {
+        if (price == null || quantity == null) {
             subtotal = BigDecimal.ZERO;
             return;
         }
-        subtotal = preco.multiply(BigDecimal.valueOf(quantidade));
+        subtotal = price.multiply(BigDecimal.valueOf(quantity));
     }
 }

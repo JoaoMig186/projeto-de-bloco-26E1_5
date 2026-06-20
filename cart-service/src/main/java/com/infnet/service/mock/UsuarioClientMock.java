@@ -1,6 +1,6 @@
 package com.infnet.service.mock;
 
-import com.infnet.DTO.mock.UsuarioDTO;
+import com.infnet.DTO.UserDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -8,13 +8,13 @@ import java.util.Map;
 @Service
 public class UsuarioClientMock {
 
-    private final Map<Long, UsuarioDTO> usuariosMock = Map.of(
-            1L, new UsuarioDTO(1L),
-            2L, new UsuarioDTO(2L),
-            3L, new UsuarioDTO(3L)
+    private final Map<Long, UserDTO> usuariosMock = Map.of(
+            1L, new UserDTO(1L),
+            2L, new UserDTO(2L),
+            3L, new UserDTO(3L)
     );
 
-    public UsuarioDTO buscarUsuario(Long id) {
+    public UserDTO buscarUsuario(Long id) {
         return usuariosMock.get(id);
     }
 }

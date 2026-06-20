@@ -3,18 +3,18 @@ package com.infnet.controller;
 import com.infnet.DTO.AddItemDTO;
 import com.infnet.DTO.PagamentoIniciadoEvent;
 import com.infnet.domain.Cart;
-import com.infnet.service.CarService;
+import com.infnet.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/carrinhos")
+@RequestMapping("/carts")
 @RequiredArgsConstructor
 public class CartController {
 
-    private final CarService service;
+    private final CartService service;
 
     @PostMapping
     public ResponseEntity<Cart> createCart(
@@ -74,10 +74,10 @@ public class CartController {
 
     @GetMapping("/order")
     public ResponseEntity<PagamentoIniciadoEvent> order(
-            @RequestHeader("X-User-Id") Long usuarioId
+            @RequestHeader("X-User-Id") Long userId
     ) {
         return ResponseEntity.ok(
-                service.buscarDadosPagamento( usuarioId)
+                service.getPaymentData( userId)
         );
     }
 }

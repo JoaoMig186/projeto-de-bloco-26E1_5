@@ -1,6 +1,6 @@
 package com.infnet.config.client;
 
-import com.infnet.DTO.mock.ProductOrderInfoDTO;
+import com.infnet.DTO.ProductOrderInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

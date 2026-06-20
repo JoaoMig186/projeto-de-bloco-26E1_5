@@ -5,13 +5,13 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CarrinhoMetrics {
+public class CartMetrics {
 
     private final Counter carrinhosCriados;
 
     private final Counter carrinhosFinalizados;
 
-    public CarrinhoMetrics(MeterRegistry registry) {
+    public CartMetrics(MeterRegistry registry) {
 
         this.carrinhosCriados =
                 Counter.builder(

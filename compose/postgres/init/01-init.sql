@@ -1,4 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS user_service;
 CREATE SCHEMA IF NOT EXISTS store_service;
 CREATE SCHEMA IF NOT EXISTS review_service;
+CREATE SCHEMA IF NOT EXISTS cart_service;
 CREATE SCHEMA IF NOT EXISTS delivery_service;

@@ -1,14 +1,32 @@
-server.port=8086
+server:
+  port: 8086
 
-# PostgreSQL
-spring.datasource.url=jdbc:postgresql://localhost:5432/carservicedb
-spring.datasource.username=car
-spring.datasource.password=car
-spring.datasource.driver-class-name=org.postgresql.Driver
+spring:
+  application:
+    name: cart-service
 
-# JPA
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carservicedb
+    username: cart
+    password: cart
+    driver-class-name: org.postgresql.Driver
 
-# Actuator / Prometheus
-management.endpoints.web.exposure.include=health,info,prometheus
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

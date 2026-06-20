@@ -1,7 +1,7 @@
 package com.infnet.service.mock;
 
-import com.infnet.DTO.mock.StoreDTO;
-import com.infnet.DTO.mock.ProductOrderInfoDTO;
+import com.infnet.DTO.StoreDTO;
+import com.infnet.DTO.ProductOrderInfoDTO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,6 +13,7 @@ public class ProdutoClientMock {
     private final Map<Long, ProductOrderInfoDTO> produtosMock = Map.of(
             1L, new ProductOrderInfoDTO(
                     1L,
+                    1L,
                     "Notebook Gamer",
                     new BigDecimal("4500.00"),
                     2.5,
@@ -21,6 +22,7 @@ public class ProdutoClientMock {
             ),
             2L, new ProductOrderInfoDTO(
                     2L,
+                    1L,
                     "Mouse Sem Fio",
                     new BigDecimal("150.00"),
                     0.2,

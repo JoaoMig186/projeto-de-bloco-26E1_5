@@ -84,6 +84,7 @@ public class ProductService {
                 product.getId(),
                 store.getId(),
                 product.getName(),
+                product.getPrice(),
                 product.getWeight(),
                 isFragile,
                 storeDTO
