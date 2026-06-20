@@ -30,5 +30,4 @@ public class ProductDocument {
     private String category;
 
     private String durability;
-
 }

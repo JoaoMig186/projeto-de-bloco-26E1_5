@@ -84,6 +84,15 @@ public class UserController {
         return ResponseEntity.ok().body(CustomerResponseDTO.toCustomerResponseDTO(customer));
     }
 
+    @GetMapping("/{userId}/geocode")
+    public ResponseEntity<CustomerGeocodeDTO> getUserGeocode(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("userId") Long id
+    ){
+       CustomerProfile customer = service.getCustomerById(authHeader,id);
+        return ResponseEntity.ok().body(CustomerGeocodeDTO.fromDomain(customer));
+    }
+
     @PutMapping("/deactivate/{userId}")
     public ResponseEntity<Void> deactivateUser(
             @RequestHeader("Authorization") String authHeader,
@@ -99,6 +108,8 @@ public class UserController {
         service.updateUserStatus(authHeader,id, Status.ACTIVE);
         return ResponseEntity.ok().build();
     }
+
+
 
 
 }

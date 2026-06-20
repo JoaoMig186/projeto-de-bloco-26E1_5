@@ -32,6 +32,62 @@ public class ProductService {
                 .toList();
     }
 
+    public List<ProductResponseDTO> listProductsByFuzzName(String term) throws IOException {
+        SearchResponse<ProductDocument> search = client.search(s -> s
+                .index("products")
+                .query(q -> q
+                        .fuzzy(f -> f
+                                .field("name")
+                                .value(term)
+                                .fuzziness("AUTO")
+                        )
+                ), ProductDocument.class
+        );
+        return search.hits().hits()
+                .stream()
+                .map(ProductResponseDTO::toDTO)
+                .toList();
+    }
+
+    public List<ProductResponseDTO> listProductsByMultiFields(String term) throws IOException {
+        SearchResponse<ProductDocument> search = client.search(s -> s
+                .index("products")
+                .query(q -> q
+                        .multiMatch(m -> m
+                                .fields("name", "description")
+                                .query(term)
+                        )
+                ), ProductDocument.class
+        );
+
+        return search.hits().hits()
+                .stream()
+                .map(ProductResponseDTO::toDTO)
+                .toList();
+    }
+
+    public List<ProductResponseDTO> listProductsByPriceRange(Double min, Double max) throws IOException {
+
+        SearchResponse<ProductDocument> search = client.search(s -> s
+                .index("products")
+                .query(q -> q
+                        .range(r -> r
+                                .number(n -> n
+                                        .field("price")
+                                        .gte(min)
+                                        .lte(max)
+                                )
+                        )
+                ), ProductDocument.class
+        );
+
+        return search.hits().hits()
+                .stream()
+                .map(ProductResponseDTO::toDTO)
+                .toList();
+    }
+
+
 
 
 }
