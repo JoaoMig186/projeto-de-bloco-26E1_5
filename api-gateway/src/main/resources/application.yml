@@ -19,6 +19,21 @@ spring:
                 - Path=/reviews/**
                 - Method=GET
 
+            - id: delivery-service-deliveries
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/deliveries/**
+
+            - id: delivery-service-drivers
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/drivers/**
+
+            - id: delivery-service-freight
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/freight/**
+
             #- id: store
             #  uri: lb://STORE
             #  predicates:
@@ -37,3 +52,9 @@ eureka:
 
 security:
   public-key: classpath:keys/public_key.pem
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info
