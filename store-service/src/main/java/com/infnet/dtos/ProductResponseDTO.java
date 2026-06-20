@@ -17,7 +17,6 @@ public record ProductResponseDTO(
         Long storeId,
         String storeName
 ) {
-    // Construtor prático para converter da Entidade para o DTO
     public ProductResponseDTO(Product product) {
         this(
                 product.getId(),

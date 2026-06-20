@@ -7,6 +7,7 @@ import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.dto.request.delivery.DeliveryRequestDTO;
 import com.infnet.dto.response.delivery.DeliveryResponseDTO;
 import com.infnet.exception.ResourceNotFoundException;
+import com.infnet.metrics.DeliveryMetrics;
 import com.infnet.repository.DeliveryRepository;
 import com.infnet.repository.DriverRepository;
 import com.infnet.service.freight.FreightService;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -30,6 +30,8 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final DriverRepository driverRepository;
     private final FreightService freightService;
+
+    private final DeliveryMetrics metrics;
     //private final DeliveryEventProducer producer;
 
     public DeliveryResponseDTO create(
@@ -64,6 +66,10 @@ public class DeliveryService {
         driver.becomeUnavailable();
         deliveryRepository.save(delivery);
         publishStatusChanged(delivery);
+        metrics.incrementCreated();
+        metrics.recordFreight(
+                delivery.getShippingPrice()
+        );
         return toResponse(delivery);
     }
 
@@ -111,6 +117,7 @@ public class DeliveryService {
         driver.becomeAvailable();
         delivery.finishDelivery();
         publishStatusChanged(delivery);
+        metrics.incrementFinished();
         return toResponse(delivery);
     }
 
@@ -131,6 +138,7 @@ public class DeliveryService {
             driver.becomeAvailable();
         }
         publishStatusChanged(delivery);
+        metrics.incrementCancelled();
         return toResponse(delivery);
     }
 
