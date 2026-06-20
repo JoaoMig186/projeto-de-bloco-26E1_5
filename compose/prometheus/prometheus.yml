@@ -3,6 +3,11 @@ global:
   evaluation_interval: 5s
 
 scrape_configs:
+  - job_name: "delivery-service"
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - "delivery-service:8082"
   - job_name: "user-service"
     metrics_path: /actuator/prometheus
     static_configs:
