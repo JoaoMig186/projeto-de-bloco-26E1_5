@@ -17,19 +17,33 @@ public class CartCleanupJob {
 
     private final CartRepository repository;
     private final CartMetrics metrics;
-    @Scheduled(fixedRate = 600000)
-    public void cleanExpiredCarts() {
 
-        LocalDateTime cutoffTime =
-                LocalDateTime.now().minusMinutes(30);
+    @Scheduled(fixedRate = 60000)
+    public void manageCartLifecycle() {
+        LocalDateTime now = LocalDateTime.now();
 
-        List<Cart> carts =
-                repository.findByStatusAndUpdatedAtBefore(
-                        CartStatus.ENVIADOPARAPAGAMENTO,
-                        cutoffTime
-                );
+        LocalDateTime cutoffForClose = now.minusMinutes(15);
+        List<Cart> cartsToClose = repository.findByStatusAndUpdatedAtBefore(
+                CartStatus.ENVIADOPARAPAGAMENTO,
+                cutoffForClose
+        );
 
-        repository.deleteAll(carts);
-        carts.forEach(cart -> metrics.incrementarCarrinhosFinalizados());
+        if (!cartsToClose.isEmpty()) {
+            cartsToClose.forEach(cart -> {
+                cart.setStatus(CartStatus.CLOSE);
+                metrics.incrementarCarrinhosFinalizados();
+            });
+            repository.saveAll(cartsToClose);
+        }
+
+        LocalDateTime cutoffForDelete = now.minusMinutes(30);
+        List<Cart> cartsToDelete = repository.findByStatusAndUpdatedAtBefore(
+                CartStatus.CLOSE,
+                cutoffForDelete
+        );
+
+        if (!cartsToDelete.isEmpty()) {
+            repository.deleteAll(cartsToDelete);
+        }
     }
 }
