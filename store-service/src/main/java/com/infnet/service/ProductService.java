@@ -3,6 +3,7 @@ package com.infnet.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infnet.dtos.OrderProductInfoDTO;
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.ProductSyncDTO;
@@ -75,6 +76,31 @@ public class ProductService {
                 .stream()
                 .map(ProductResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+    public OrderProductInfoDTO getProductInfoForOrder(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+        Store store = product.getStore();
+
+        boolean isFragile = product.getDurability() == Durability.FRAGIL;
+
+        OrderProductInfoDTO.StoreDTO storeDTO = new OrderProductInfoDTO.StoreDTO(
+                store.getId(),
+                store.getName(),
+                store.getLatitude(),
+                store.getLongitude()
+        );
+
+        return new OrderProductInfoDTO(
+                product.getId(),
+                store.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getWeight(),
+                isFragile,
+                storeDTO
+        );
     }
 
 //    private void syncWithSearchService(Product product, Store store) {
