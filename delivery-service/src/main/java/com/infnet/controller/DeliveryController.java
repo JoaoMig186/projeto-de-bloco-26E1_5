@@ -39,7 +39,7 @@ public class DeliveryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DeliveryResponseDTO> findById(
-            @PathVariable UUID id
+            @PathVariable("id") UUID id
     ) {
         return ResponseEntity.ok(
                 service.findById(id)
@@ -48,7 +48,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/start")
     public ResponseEntity<DeliveryResponseDTO> start(
-            @PathVariable UUID id
+            @PathVariable("id") UUID id
     ) {
         return ResponseEntity.ok(
                 service.startDelivery(id)
@@ -57,7 +57,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/finish")
     public ResponseEntity<DeliveryResponseDTO> finish(
-            @PathVariable UUID id
+            @PathVariable("id") UUID id
     ) {
         return ResponseEntity.ok(
                 service.finishDelivery(id)
@@ -66,7 +66,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<DeliveryResponseDTO> cancel(
-            @PathVariable UUID id
+            @PathVariable("id") UUID id
     ) {
         return ResponseEntity.ok(
                 service.cancel(id)
@@ -75,7 +75,7 @@ public class DeliveryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable UUID id
+            @PathVariable("id") UUID id
     ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
