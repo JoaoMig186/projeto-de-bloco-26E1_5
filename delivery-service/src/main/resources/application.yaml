@@ -11,9 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
     show-sql: true
-
     properties:
       hibernate:
         default_schema: delivery_service
@@ -38,11 +36,13 @@ spring:
     listener:
       missing-topics-fatal: false
 
+server:
+  port: 8082
+
 eureka:
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/
-
     register-with-eureka: true
     fetch-registry: true
 
@@ -57,15 +57,36 @@ management:
   zipkin:
     tracing:
       endpoint: http://zipkin:9411/api/v2/spans
-  server:
-    port: 8082
+
   endpoints:
     web:
       exposure:
-        include: gateway,health,info,prometheus,metrics
+        include: health,info,prometheus,metrics,circuitbreakers,circuitbreakerevents
+
   endpoint:
     prometheus:
       enabled: true
+
   metrics:
     tags:
       application: ${spring.application.name}
+
+resilience4j:
+  retry:
+    instances:
+      freightService:
+        max-attempts: 3
+        wait-duration: 2s
+        retry-exceptions:
+          - java.lang.Exception
+
+  circuitbreaker:
+    instances:
+      freightService:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true

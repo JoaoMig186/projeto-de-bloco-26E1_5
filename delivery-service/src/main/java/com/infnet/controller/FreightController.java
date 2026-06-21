@@ -26,4 +26,13 @@ public class FreightController {
                 .status(HttpStatus.OK)
                 .body(service.calculate(dto));
     }
+
+    @PostMapping("/calculate-with-error")
+    public ResponseEntity<FreightResponseDTO> forceErrorCalculateFreight(
+            @RequestBody FreightRequestDTO dto
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.forceErrorCalculateFreight(dto));
+    }
 }
