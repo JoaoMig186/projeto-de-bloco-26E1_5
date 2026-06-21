@@ -1,0 +1,26 @@
+spring:
+  elasticsearch:
+    uris: elasticsearch-db:9200
+
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+
+  kafka:
+    bootstrap-servers: kafka:29092
+    consumer:
+      group-id: search-service-v1
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: com.infnet.events
+        spring.json.use.type.headers: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+
+server:
+  port: 0

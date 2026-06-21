@@ -1,7 +1,8 @@
 package com.infnet.controller;
 
-import com.infnet.dtos.ProductResponseDTO;
-import com.infnet.service.ProductService;
+
+import com.infnet.dtos.StoreProductsDTO;
+import com.infnet.service.SearchService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,17 +14,17 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/icimento")
 @AllArgsConstructor
 @Validated
-public class ProductController {
+public class SearchController {
 
 
-    private ProductService service;
+    private SearchService searchService;
 
-    @GetMapping("/search/name")
-    public List<ProductResponseDTO> listProductsByName(@RequestParam String term) throws IOException {
-        return service.listProductsByName(term);
+    @GetMapping("/search")
+    public List<StoreProductsDTO> listProductsByName(@RequestParam String term) throws IOException {
+        return searchService.listProductsByMultimatchFuzzyGroupedByStore(term);
     }
 
 }

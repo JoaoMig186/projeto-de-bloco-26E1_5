@@ -37,6 +37,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO dto) {
+
         Store store = storeRepository.findById(dto.storeId())
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada para associar o produto."));
 
@@ -46,11 +47,12 @@ public class ProductService {
         product.setPrice(dto.price());
         product.setStockQuantity(dto.stockQuantity());
 
-        // Blindagem aplicada apenas na categoria (converte qualquer entrada para maiúsculas)
         product.setCategory(Category.valueOf(dto.category().toUpperCase()));
 
-        // Durabilidade continua com formatação estrita
-        product.setDurability(Durability.valueOf(dto.durability()));
+        product.setDurability(
+                Durability.valueOf(dto.durability().trim().toUpperCase())
+        );
+
         product.setWeight(dto.weight());
         product.setStore(store);
 
@@ -65,9 +67,10 @@ public class ProductService {
                 ProductEventType.PRODUCT_CREATED,
                 payload
         );
+
         outboxRepository.save(event);
 
-        storeMetrics.incrementProductCreation(product.getCategory().name());;
+        storeMetrics.incrementProductCreation(product.getCategory().name());
 
         return new ProductResponseDTO(product);
     }
