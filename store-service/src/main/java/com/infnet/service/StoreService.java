@@ -28,6 +28,8 @@ public class StoreService {
         store.setName(dto.name());
         store.setCnpj(dto.cnpj());
         store.setAddress(dto.address());
+        store.setLatitude(dto.latitude());
+        store.setLongitude(dto.longitude());
         store.setPhone(dto.phone());
         store.setActive(true);
 

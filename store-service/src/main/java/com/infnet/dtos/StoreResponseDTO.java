@@ -7,6 +7,9 @@ public record StoreResponseDTO(
         String name,
         String cnpj,
         String address,
+        Double latitude,
+
+        Double longitude,
         String phone,
         boolean active
 ) {
@@ -17,6 +20,8 @@ public record StoreResponseDTO(
                 store.getName(),
                 store.getCnpj(),
                 store.getAddress(),
+                store.getLatitude(),
+                store.getLongitude(),
                 store.getPhone(),
                 store.isActive()
         );

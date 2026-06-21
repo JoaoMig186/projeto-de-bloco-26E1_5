@@ -15,5 +15,9 @@ public record StoreRequestDTO(
         @NotBlank(message = "O endereço é obrigatório")
         String address,
 
+        Double latitude,
+
+        Double longitude,
+
         String phone
 ) {}
