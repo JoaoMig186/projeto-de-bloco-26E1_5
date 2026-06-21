@@ -59,7 +59,15 @@ public class CartController {
                 service.removeItem(id, userId, itemId)
         );
     }
-
+    @PostMapping("/{id}/finalize")
+    public ResponseEntity<Cart> finalizeCart(
+            @PathVariable("id") Long id,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        return ResponseEntity.ok(
+                service.finalizeCart(id, userId)
+        );
+    }
     @DeleteMapping("/{id}/clear")
     public ResponseEntity<Cart> clearCart(
             @PathVariable("id") Long id,
