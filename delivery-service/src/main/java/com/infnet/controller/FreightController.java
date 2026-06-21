@@ -1,9 +1,10 @@
 package com.infnet.controller;
 
-import com.infnet.dto.request.Freight.FreightRequestDTO;
-import com.infnet.dto.request.Freight.FreightResponseDTO;
+import com.infnet.dto.request.freight.FreightRequestDTO;
+import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.service.freight.FreightService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +22,17 @@ public class FreightController {
     public ResponseEntity<FreightResponseDTO> calculate(
             @RequestBody FreightRequestDTO dto
     ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.calculate(dto));
+    }
 
-        return ResponseEntity.ok(
-                service.calculate(dto)
-        );
+    @PostMapping("/calculate-with-error")
+    public ResponseEntity<FreightResponseDTO> forceErrorCalculateFreight(
+            @RequestBody FreightRequestDTO dto
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(service.forceErrorCalculateFreight(dto));
     }
 }

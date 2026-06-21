@@ -1,9 +1,11 @@
 package com.infnet.config;
 
 import com.infnet.dto.response.utils.ErrorResponseDTO;
+import com.infnet.exception.BusinessException;
 import com.infnet.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,7 +17,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponseDTO> treatValidation(
-            MethodArgumentNotValidException ex
+            MethodArgumentTypeMismatchException ex
     ) {
 
         ErrorResponseDTO response = new ErrorResponseDTO(
@@ -87,5 +89,22 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBusinessException(
+            BusinessException ex
+    ) {
+        ErrorResponseDTO response = new ErrorResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Service Unavailable",
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
     }
 }

@@ -1,7 +1,7 @@
 package com.infnet.controller;
 
-import com.infnet.dtos.StoreRequestDTO;
-import com.infnet.dtos.StoreResponseDTO;
+import com.infnet.dtos.*;
+import com.infnet.service.ProductService;
 import com.infnet.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,31 +17,47 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final ProductService productService;
 
-    // Endpoint para registar uma nova loja parceira
     @PostMapping
     public ResponseEntity<StoreResponseDTO> createStore(@Valid @RequestBody StoreRequestDTO dto) {
         StoreResponseDTO createdStore = storeService.createStore(dto);
-        // Retorna o status 201 (Created) em vez do padrão 200 (OK)
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
     }
 
-    // Endpoint para listar as lojas disponíveis (para clientes ou integradores)
     @GetMapping
     public ResponseEntity<List<StoreResponseDTO>> getAllActiveStores() {
         return ResponseEntity.ok(storeService.getAllActiveStores());
     }
 
-    // Endpoint para consultar detalhes de uma loja específica
+    // AQUI: Adicionado ("id")
     @GetMapping("/{id}")
-    public ResponseEntity<StoreResponseDTO> getStoreById(@PathVariable Long id) {
+    public ResponseEntity<StoreResponseDTO> getStoreById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(storeService.getStoreById(id));
     }
 
-    // Endpoint para inativar uma loja
+    // AQUI: Adicionado ("id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivateStore(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateStore(@PathVariable("id") Long id) {
         storeService.deactivateStore(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/products")
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) {
+        ProductResponseDTO createdProduct = productService.createProduct(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    }
+
+    // AQUI: Adicionado ("storeId")
+    @GetMapping("/{storeId}/products")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByStore(@PathVariable("storeId") Long storeId) {
+        return ResponseEntity.ok(productService.getProductsByStore(storeId));
+    }
+
+    // Endpoint para consumo interno do Order Service
+    @GetMapping("/products/{productId}/order-info")
+    public ResponseEntity<OrderProductInfoDTO> getProductInfoForOrder(@PathVariable("productId") Long productId) {
+        return ResponseEntity.ok(productService.getProductInfoForOrder(productId));
     }
 }

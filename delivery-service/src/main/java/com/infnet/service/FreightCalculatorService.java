@@ -1,8 +1,8 @@
 package com.infnet.service;
 
 import com.infnet.domain.entity.enums.VehicleType;
-import com.infnet.dto.request.Freight.FreightRequestDTO;
-import com.infnet.dto.request.Freight.FreightResponseDTO;
+import com.infnet.dto.request.freight.FreightRequestDTO;
+import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.service.freight.FreightStrategyFactory;
 import com.infnet.service.freight.VehicleSelectionService;
 import com.infnet.service.freight.strategy.FreightStrategy;
