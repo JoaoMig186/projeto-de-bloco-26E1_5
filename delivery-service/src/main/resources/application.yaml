@@ -50,12 +50,19 @@ eureka:
     prefer-ip-address: true
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
   server:
     port: 8082
   endpoints:
     web:
       exposure:
-        include: gateway,health,info,prometheus
+        include: gateway,health,info,prometheus,metrics
   endpoint:
     prometheus:
       enabled: true
