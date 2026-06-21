@@ -1,4 +1,12 @@
 package com.infnet.dto;
 
-public record OrderRequestDTO() {
+import com.infnet.domain.enums.PaymentMethod;
+
+public record OrderRequestDTO(
+
+        Long idUser,
+        Long idStore,
+        Long idCart,
+        PaymentMethod paymentMethod) {
+
 }

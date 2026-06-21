@@ -1,7 +1,138 @@
 package com.infnet.service;
 
+import com.infnet.domain.Order;
+import com.infnet.domain.enums.DeliveryStatus;
+import com.infnet.domain.enums.OrderStatus;
+import com.infnet.domain.enums.PaymentStatus;
+import com.infnet.dto.OrderRequestDTO;
+import com.infnet.dto.cart.PagamentoIniciadoResponseDTO;
+import com.infnet.dto.delivery.DeliveryShipResponse;
+import com.infnet.dto.delivery.FreightRequestDTO;
+import com.infnet.dto.store.GeocodeResponseDTO;
+import com.infnet.excepton.OrderNotFoundException;
+import com.infnet.kafka.KafkaProducerService;
+import com.infnet.kafka.events.OrderCreatedEvent;
+import com.infnet.kafka.events.PaymentApprovatedEvent;
+import com.infnet.repository.OrderRepository;
+import com.infnet.service.cart.CartService;
+import com.infnet.service.delivery.DeliveryService;
+import com.infnet.service.store.StoreService;
+import com.infnet.service.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
+    OrderRepository orderRepository;
+    DeliveryService deliveryService;
+    CartService cartService;
+    UserService userService;
+    StoreService storeService;
+    KafkaProducerService kafkaProducerService;
+
+public Order registerOrder(OrderRequestDTO request){
+
+    PagamentoIniciadoResponseDTO cart = cartService.getCart(request.idCart());
+
+    Order order = new Order(
+            request.idUser(),
+            request.idStore(),
+            request.idCart(),
+            request.paymentMethod()
+    );
+
+    order.setProductsPrice(cart.valorTotal());
+    order.setProductList(cart.itens());
+
+    GeocodeResponseDTO geocodeUser = userService.getGeocode(request.idUser());
+    GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
+
+    FreightRequestDTO dto = new FreightRequestDTO(
+            haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()), // passar a lat1, lat2, lon1, lon2
+            cart.pesoTotalCart()
+    );
+
+    DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
+    order.setShippingPrice(deliveryShipResponse.freightValue());
+
+    BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
+    order.setTotalPrice(totalPrice);
+
+    Order saved = orderRepository.save(order);
+
+    kafkaProducerService.sendOrderCreatedEvent(
+            new OrderCreatedEvent(
+                    saved.getId(),
+                    saved.getIdStore(),
+                    saved.getIdUser(),
+                    saved.getTotalPrice(),
+                    saved.getPaymentMethod()
+            )
+    );
+
+    return saved;
+}
+
+//  ✅ Metodo Kafka
+    @Transactional
+    public void updateStatusPayment(Long orderId, String paymentStatus){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        PaymentStatus status = PaymentStatus.valueOf(paymentStatus);
+
+        if (status == PaymentStatus.APPROVED) {
+            kafkaProducerService.sendPaymentApprovatedEvent(
+                    new PaymentApprovatedEvent(
+                            order.getId(), true
+                    )
+            );
+            order.setPaymentStatus(status);
+        } else {
+            order.setPaymentStatus(status);
+        }
+
+    }
+
+
+//    ✅ Metodo Kafka
+    @Transactional
+    public void updateStatusDelivery(Long orderId, String deliveryStatus){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        DeliveryStatus status = DeliveryStatus.valueOf(deliveryStatus);
+        order.setDeliveryStatus(status);
+    }
+
+public Order findById(Long id){
+    return orderRepository.findById(id)
+            .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+}
+
+public List<Order> findAll(){
+    return orderRepository.findAll();
+}
+
+public void deleteById(Long id){
+    orderRepository.deleteById(id);
+}
+
+// Helpers
+    public static Double haversine(Double lat1, Double lon1, Double lat2, Double lon2){
+        final Double R = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 }
