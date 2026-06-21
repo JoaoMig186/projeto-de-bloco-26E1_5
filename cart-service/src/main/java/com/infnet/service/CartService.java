@@ -13,6 +13,8 @@ import com.infnet.config.client.StoreClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -64,14 +66,19 @@ public class CartService {
         item.setProductId(product.itemId());
         item.setStoreId(store.id());
         item.setProductName(product.productName());
-        item.setPrice(product.preco());
+        item.setPrice(product.price());
         item.setQuantity(dto.quantidade());
         item.setWeight(product.weight());
         item.setFragile(product.fragile());
-        item.setLatitude(store.latitude());
-        item.setLongitude(store.longitude());
-
-        item.calculateSubtotal();
+        item.setStore(new StoreDTO(
+                store.id(),
+                store.name(),
+                store.latitude(),
+                store.longitude()
+        ));
+        item.setSubtotal(
+                item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+        );
         cart.getItems().add(item);
         cart.calculateTotal();
         cart.calculateTotalWeight();
@@ -115,14 +122,14 @@ public class CartService {
                                 item.getProductId(),
                                 item.getStoreId(),
                                 item.getProductName(),
-                                item.getQuantity(),
+                                item.getPrice(),
                                 item.getWeight(),
                                 item.getFragile(),
                                 new StoreDTO(
-                                        item.getStoreId(),
-                                        item.getStoreName(),
-                                        item.getLatitude(),
-                                        item.getLongitude()
+                                        item.getStore().id(),
+                                        item.getStore().name(),
+                                        item.getStore().latitude(),
+                                        item.getStore().longitude()
                                 )
                         ))
                         .toList()

@@ -51,6 +51,7 @@ public class ProductService {
 
         // Durabilidade continua com formatação estrita
         product.setDurability(Durability.valueOf(dto.durability()));
+        product.setWeight(dto.weight());
         product.setStore(store);
 
         product = productRepository.save(product);

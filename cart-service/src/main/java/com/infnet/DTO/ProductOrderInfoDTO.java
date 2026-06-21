@@ -6,7 +6,7 @@ public record ProductOrderInfoDTO(
         Long itemId,
         Long storeId,
         String productName,
-        BigDecimal preco,
+        BigDecimal price,
         Double weight,
         Boolean fragile,
         StoreDTO store

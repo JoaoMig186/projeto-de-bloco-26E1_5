@@ -28,7 +28,7 @@ public class CartController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCart(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
 
@@ -36,10 +36,9 @@ public class CartController {
                 service.getCart(id, userId)
         );
     }
-
     @PostMapping("/{id}/items")
     public ResponseEntity<Cart> addItem(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestHeader("X-User-Id") Long userId,
             @RequestBody AddItemDTO dto
     ) {
@@ -51,8 +50,8 @@ public class CartController {
 
     @DeleteMapping("/{id}/items/{itemId}")
     public ResponseEntity<Cart> removeItem(
-            @PathVariable Long id,
-            @PathVariable Long itemId,
+            @PathVariable("id") Long id,
+            @PathVariable("itemId") Long itemId,
             @RequestHeader("X-User-Id") Long userId
     ) {
 
@@ -63,7 +62,7 @@ public class CartController {
 
     @DeleteMapping("/{id}/clear")
     public ResponseEntity<Cart> clearCart(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
 

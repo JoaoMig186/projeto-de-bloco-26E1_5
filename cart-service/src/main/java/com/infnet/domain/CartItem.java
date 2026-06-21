@@ -1,6 +1,8 @@
 package com.infnet.domain;
 
+import com.infnet.DTO.StoreDTO;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.*;
 import java.math.BigDecimal;
 
@@ -19,9 +21,8 @@ public class CartItem {
     private BigDecimal subtotal;
     private Double weight;
     private Boolean fragile;
-    private String storeName;
-    private Double latitude;
-    private Double longitude;
+    @Embedded
+    private StoreDTO store;
 
     public void calculateSubtotal() {
         if (price == null || quantity == null) {
