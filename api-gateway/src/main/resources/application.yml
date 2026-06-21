@@ -12,11 +12,30 @@ spring:
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/users/**
-
+            - id: cart-service
+              uri: lb://CART-SERVICE
+              predicates:
+                - Path=/carts/**
             - id: review-service
               uri: lb://REVIEW-SERVICE
               predicates:
                 - Path=/reviews/**
+                - Method=GET
+
+            - id: delivery-service-deliveries
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/deliveries/**
+
+            - id: delivery-service-drivers
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/drivers/**
+
+            - id: delivery-service-freight
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/freight/**
 
             #- id: store
             #  uri: lb://STORE
@@ -34,3 +53,18 @@ eureka:
   instance:
     instance-id: ${spring.application.name}:${random.value}
 
+security:
+  public-key: classpath:keys/public_key.pem
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info

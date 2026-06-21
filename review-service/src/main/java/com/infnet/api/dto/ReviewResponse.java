@@ -10,7 +10,9 @@ public record ReviewResponse(
         String authorName,
         Integer rating,
         String comment,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String ownerReply,
+        LocalDateTime ownerReplyAt
 ) {
     public static ReviewResponse toResponse(Review review) {
         return new ReviewResponse(
@@ -18,7 +20,9 @@ public record ReviewResponse(
                 review.getAuthorName(),
                 review.getRating(),
                 review.getComment(),
-                review.getCreatedAt()
+                review.getCreatedAt(),
+                review.getOwnerReply(),
+                review.getOwnerReplyAt()
         );
     }
 }

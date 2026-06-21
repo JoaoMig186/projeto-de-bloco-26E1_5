@@ -31,8 +31,8 @@ public class JwtService {
         }
     }
 
-    public void validateToken(String token) {
-       Jwts.parser()
+    public Claims validateToken(String token) {
+       return Jwts.parser()
             .verifyWith(publicKey)
             .build()
             .parseSignedClaims(token)

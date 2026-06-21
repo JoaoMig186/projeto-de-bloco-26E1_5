@@ -2,6 +2,7 @@ package com.infnet.dtos;
 
 import com.infnet.model.Product;
 import com.infnet.model.enums.Category;
+import com.infnet.model.enums.Durability;
 
 import java.math.BigDecimal;
 
@@ -12,10 +13,10 @@ public record ProductResponseDTO(
         BigDecimal price,
         Integer stockQuantity,
         Category category,
+        Durability durability,
         Long storeId,
         String storeName
 ) {
-    // Construtor prático para converter da Entidade para o DTO
     public ProductResponseDTO(Product product) {
         this(
                 product.getId(),
@@ -24,6 +25,7 @@ public record ProductResponseDTO(
                 product.getPrice(),
                 product.getStockQuantity(),
                 product.getCategory(),
+                product.getDurability(),
                 product.getStore().getId(),
                 product.getStore().getName()
         );

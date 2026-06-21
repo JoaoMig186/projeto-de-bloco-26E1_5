@@ -18,7 +18,8 @@
         <module>geocode-fake-service</module>
         <module>review-service</module>
         <module>delivery-service</module>
-        <module>order-service</module>
+        <module>cart-service</module>
+        <module>search-service</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
@@ -68,6 +69,12 @@
                     <version>3.14.0</version>
                     <configuration>
                         <release>${java.version}</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
             </plugins>

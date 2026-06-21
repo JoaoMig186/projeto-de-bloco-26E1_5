@@ -1,6 +1,7 @@
 package com.infnet.model;
 
 import com.infnet.model.enums.Category;
+import com.infnet.model.enums.Durability;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,14 +27,21 @@ public class Product {
     private String description;
 
     @Column(nullable = false)
-    private BigDecimal price; // BigDecimal é a melhor prática em Java para dados financeiros
+    private BigDecimal price;
 
     @Column(nullable = false)
-    private Integer stockQuantity; // Controla o estoque em tempo real
+    private Integer stockQuantity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Category category; // Ex: "Pisos", "Cimentos", "Ferragens", conforme o PDF de Objetivo
+    private Category category; // Ex: "Pisos", "Cimentos", "Ferragens"
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Durability durability;
+
+    @Column(nullable = false)
+    private Double weight;
 
     // Muitos produtos pertencem a uma única loja
     @ManyToOne(fetch = FetchType.LAZY)

@@ -27,7 +27,7 @@ public class Delivery {
 
     private Double distanceKm;
 
-    private Double estimatedTimeMinutes;
+    private Integer estimatedTimeMinutes;
 
     private Double shippingPrice;
 
@@ -43,4 +43,92 @@ public class Delivery {
         this.createdAt = LocalDateTime.now();
     }
 
+    public static Delivery create(
+            UUID orderId,
+            String originAddress,
+            String destinationAddress,
+            Double distanceKm,
+            Integer estimatedTimeMinutes,
+            Double shippingPrice
+    ) {
+
+        if(distanceKm <= 0) {
+            throw new IllegalArgumentException(
+                    "Distância deve ser maior que zero."
+            );
+        }
+
+        if(shippingPrice < 0) {
+            throw new IllegalArgumentException(
+                    "Valor do frete inválido."
+            );
+        }
+
+        Delivery delivery = new Delivery();
+
+        delivery.orderId = orderId;
+        delivery.originAddress = originAddress;
+        delivery.destinationAddress = destinationAddress;
+        delivery.distanceKm = distanceKm;
+        delivery.estimatedTimeMinutes = estimatedTimeMinutes;
+        delivery.shippingPrice = shippingPrice;
+        delivery.status = DeliveryStatus.CREATED;
+
+        return delivery;
+    }
+
+    public void assignDriver(UUID driverId) {
+
+        if(this.status != DeliveryStatus.CREATED) {
+            throw new IllegalStateException(
+                    "Motorista só pode ser atribuído a entregas criadas."
+            );
+        }
+
+        if(this.driverId != null) {
+            throw new IllegalStateException(
+                    "Entrega já possui motorista."
+            );
+        }
+
+        this.driverId = driverId;
+        this.status = DeliveryStatus.DRIVER_ASSIGNED;
+    }
+
+    public void startDelivery() {
+
+        if(this.status != DeliveryStatus.DRIVER_ASSIGNED) {
+            throw new IllegalStateException(
+                    "A entrega não pode ser iniciada."
+            );
+        }
+
+        this.status = DeliveryStatus.IN_TRANSIT;
+    }
+
+    public void finishDelivery() {
+
+        if(this.status != DeliveryStatus.IN_TRANSIT) {
+            throw new IllegalStateException(
+                    "A entrega não está em trânsito."
+            );
+        }
+
+        this.status = DeliveryStatus.DELIVERED;
+        this.deliveredAt = LocalDateTime.now();
+    }
+
+    public void cancel() {
+
+        if(
+                this.status == DeliveryStatus.DELIVERED ||
+                        this.status == DeliveryStatus.CANCELLED
+        ) {
+            throw new IllegalStateException(
+                    "Não é possível cancelar a entrega."
+            );
+        }
+
+        this.status = DeliveryStatus.CANCELLED;
+    }
 }
