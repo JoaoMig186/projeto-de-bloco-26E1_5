@@ -1,6 +1,8 @@
 package com.infnet.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.infnet.dtos.ErrorResponseDTO;
+import org.apache.commons.lang.SerializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,4 +48,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(SerializationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleSerializationException(SerializationException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro ao criar Payload",
+                List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
 }

@@ -36,9 +36,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

@@ -45,6 +45,18 @@ services:
       postgres:
         condition: service_healthy
 
+  # SEARCH SERVICE
+  search-service:
+    build: ../search-service
+    container_name: search-service
+
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
   # GEOCODE-FAKE-SERVICE
   geocode-fake-service:
     build: ../geocode-fake-service
@@ -84,10 +96,27 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-  # CAR SERVICE
+  # CART SERVICE
   cart-service:
-    build: ../car-service
-    container_name: car-service
+    build: ../cart-service
+    container_name: cart-service
+
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      postgres:
+        condition: service_healthy
+
+      kafka:
+        condition: service_healthy
+  #DELIVERY SERVICE
+  delivery-service:
+    build: ../delivery-service
+    container_name: delivery-service
 
     networks:
       - icimento-network
@@ -201,6 +230,27 @@ services:
     networks:
       - icimento-network
 
+  #ZIPKIN
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - icimento-network
+
+  elasticsearch-db:
+    image: elasticsearch:8.19.2
+    container_name: elasticsearch-db
+    ports:
+      - "9201:9200"
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    restart: unless-stopped
+    networks:
+      - icimento-network
 
 volumes:
   icimento-postgres-data:
