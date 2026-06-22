@@ -23,8 +23,6 @@ public class KafkaSearchListener {
     @KafkaListener(topics = "icimento.store.product.sync")
     public void receiveOutboxProductSyncEvent(String payload){
 
-        log.info("Payload recebido: {}", payload);
-
         try{
             ProductSyncDTO product =
                     objectMapper.readValue(payload, ProductSyncDTO.class);
