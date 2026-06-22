@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GeocodeResponseDTO {
-    private Double latitude;
-    private Double longitude;
+    private Double lat;
+    private Double lon;
 }
