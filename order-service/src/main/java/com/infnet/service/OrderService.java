@@ -106,6 +106,7 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
     return orderMetrics.medirTempoDePedido(() -> {
 
         PagamentoIniciadoResponseDTO cart = cartService.getCart(userId);
+
         log.info("[ORDER] Carrinho obtido - carrinhoId={}, total={}, itens={}",
                 cart.carrinhoId(), cart.valorTotal(), cart.itens().size());
         Order order = new Order(
@@ -142,6 +143,8 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
         DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
         log.info("[ORDER] Frete calculado - valor={}", deliveryShipResponse.freightValue());
         order.setShippingPrice(deliveryShipResponse.freightValue());
+        order.setEstimatedMinutes(deliveryShipResponse.estimatedMinutes());
+        order.setVehicleType(deliveryShipResponse.vehicleType());
 
         BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
         order.setTotalPrice(totalPrice);
