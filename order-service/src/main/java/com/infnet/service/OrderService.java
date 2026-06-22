@@ -152,15 +152,13 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
         Order saved = orderRepository.save(order);
         log.info("[ORDER] Pedido salvo - orderId={}, total={}", saved.getId(), saved.getTotalPrice());
 
-        kafkaProducerService.sendOrderCreatedEvent(
-                new OrderCreatedEvent(
-                        saved.getId(),
-                        saved.getIdStore(),
-                        saved.getIdUser(),
-                        saved.getTotalPrice(),
-                        saved.getPaymentMethod()
+
+        kafkaProducerService.sendPaymentApprovatedEvent(
+                new PaymentApprovatedEvent(
+                        order.getId(), true
                 )
         );
+
         log.info("[ORDER] Evento OrderCreated enviado - orderId={}", saved.getId());
 
         incrementarPedidosCriados();
@@ -168,34 +166,6 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
     });
 }
 
-
-//  ✅ Metodo Kafka
-    @Transactional
-    public void updateStatusPayment(Long orderId, String paymentStatus){
-        log.info("[ORDER] Atualizando status de pagamento - orderId={}, status={}", orderId, paymentStatus);
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> {
-                    log.warn("[ORDER] Pedido não encontrado - orderId={}", orderId);
-                    return new OrderNotFoundException("Order not found");
-                });
-
-        PaymentStatus status = PaymentStatus.valueOf(paymentStatus);
-
-        if (status == PaymentStatus.APPROVED) {
-            kafkaProducerService.sendPaymentApprovatedEvent(
-                    new PaymentApprovatedEvent(
-                            order.getId(), true
-                    )
-            );
-            log.info("[ORDER] Pagamento aprovado, evento enviado - orderId={}", orderId);
-            order.setPaymentStatus(status);
-        } else {
-            log.warn("[ORDER] Pagamento não aprovado - orderId={}, status={}", orderId, status);
-            order.setPaymentStatus(status);
-        }
-
-    }
 
 
 //    ✅ Metodo Kafka

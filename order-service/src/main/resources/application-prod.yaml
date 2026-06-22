@@ -39,7 +39,7 @@ api:
   endpoints:
     user: USER-SERVICE
     store: STORE-SERVICE
-    payment: PAYMENT-SERVICE
+
     delivery: DELIVERY-SERVICE
     cart: CART-SERVICE
 
