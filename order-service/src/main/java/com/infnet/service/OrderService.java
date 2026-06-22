@@ -42,64 +42,6 @@ public class OrderService {
     private final OrderMetrics orderMetrics;
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
-//Sem metrica
-//public Order registerOrder(OrderRequestDTO request, Long userId){
-//
-//    PagamentoIniciadoResponseDTO cart = cartService.getCart(userId);
-//
-//    Order order = new Order(
-//            userId,
-//            request.idStore(),
-//            cart.carrinhoId(),
-//            request.paymentMethod()
-//    );
-//
-//    List<ItemOrder> items = cart.itens().stream()
-//                    .map(
-//                            dto -> new ItemOrder(
-//                                    dto.itemId(),
-//                                    dto.lojaId(),
-//                                    dto.nomeProduto(),
-//                                    dto.fragil(),
-//                                    dto.peso(),
-//                                    dto.quantidade(),
-//                                    order
-//                            )
-//                    ).toList();
-//
-//    order.setProductsPrice(cart.valorTotal());
-//    order.setProductList(items);
-//
-//    GeocodeResponseDTO geocodeUser = userService.getGeocode(userId);
-//    GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
-//
-//    FreightRequestDTO dto = new FreightRequestDTO(
-//            haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()), // passar a lat1, lat2, lon1, lon2
-//            cart.pesoTotalCart()
-//    );
-//
-//    DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
-//    order.setShippingPrice(deliveryShipResponse.freightValue());
-//
-//    BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
-//    order.setTotalPrice(totalPrice);
-//
-//    Order saved = orderRepository.save(order);
-//
-//    kafkaProducerService.sendOrderCreatedEvent(
-//            new OrderCreatedEvent(
-//                    saved.getId(),
-//                    saved.getIdStore(),
-//                    saved.getIdUser(),
-//                    saved.getTotalPrice(),
-//                    saved.getPaymentMethod()
-//            )
-//    );
-//
-//    incrementarPedidosCriados();
-//    return saved;
-//}
-
 // Com metrica
 public Order registerOrder(OrderRequestDTO request, Long userId){
     log.info("[ORDER] Iniciando criação de pedido - userId={}, idStore={}", userId, request.idStore());
