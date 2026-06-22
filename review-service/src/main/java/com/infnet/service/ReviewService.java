@@ -6,6 +6,7 @@ import com.infnet.api.dto.StoreReviewSummaryResponse;
 import com.infnet.api.dto.ValidacaoStoreResponse;
 import com.infnet.api.exception.DuplicateReviewException;
 import com.infnet.api.exception.ForbiddenAuthorizationException;
+import com.infnet.api.exception.ReviewAlreadyRepliedException;
 import com.infnet.api.exception.ReviewNotFoundException;
 import com.infnet.domain.Review;
 import com.infnet.kafka.KafkaService;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +42,6 @@ public class ReviewService {
 
         storeService.validarStore(storeId);
 
-
         Review review = new Review(
                 storeId,
                 authorId,
@@ -64,7 +63,7 @@ public class ReviewService {
         return saved;
     }
 
-    public Review reply(UUID reviewId, CreateReplyRequest request, String role, Long ownerId) {
+    public Review reply(Long reviewId, CreateReplyRequest request, String role, Long ownerId) {
         if (!"STORE_OWNER".equals(role)) {
             log.warn("Usuário {} ({}) tentou responder review sem permissão", ownerId, role);
             throw new ForbiddenAuthorizationException("Apenas lojistas podem responder avaliações");
@@ -76,11 +75,26 @@ public class ReviewService {
         ValidacaoStoreResponse store = storeService.validarStore(review.getStoreId());
 
         if (!store.ownerId().equals(ownerId)) {
-            throw new ForbiddenAuthorizationException("Usuário não é proprietário da loja");
+            log.warn(
+                    "Lojista {} tentou responder uma avaliação da loja {}, pertencente ao lojista {}",
+                    ownerId,
+                    review.getStoreId(),
+                    store.ownerId()
+            );
+
+            throw new ForbiddenAuthorizationException(
+                    "Usuário não é proprietário da loja"
+            );
         }
 
-        review.setOwnerReply(request.comment());
-        review.setOwnerReplyAt(LocalDateTime.now());
+        if (review.getStoreReply() != null) {
+            throw new ReviewAlreadyRepliedException(
+                    "Esta avaliação já possui uma resposta"
+            );
+        }
+
+        review.setStoreReply(request.reply());
+        review.setStoreReplyAt(LocalDateTime.now());
         Review saved = repository.save(review);
         metrics.incrementTotalReplies();
 
@@ -89,6 +103,23 @@ public class ReviewService {
 
     public List<Review> findByStore(Long storeId) {
         return repository.findByStoreId(storeId);
+    }
+
+    public void delete(Long reviewId, String role) {
+        if (!"ADMIN".equals(role)) {
+            log.warn("Usuário sem permissão tentou excluir review {}", reviewId);
+            throw new ForbiddenAuthorizationException("Apenas administradores podem excluir avaliações");
+        }
+
+        Review review = repository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("Avaliação não encontrada: " + reviewId));
+
+        Long storeId = review.getStoreId();
+        repository.delete(review);
+        log.info("Review {} excluída pelo admin", reviewId);
+
+        StoreReviewSummaryResponse summary = getSummary(storeId);
+        kafkaService.sendStoreRatingUpdatedEvent(storeId, summary.averageRating(), summary.totalReviews());
     }
 
     public StoreReviewSummaryResponse getSummary(Long storeId) {

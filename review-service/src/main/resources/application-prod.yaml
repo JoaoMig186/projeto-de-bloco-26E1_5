@@ -19,6 +19,31 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      storeValidation:
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+        ignoreExceptions:
+          - feign.FeignException.NotFound
+          - feign.FeignException.BadRequest
+  retry:
+    instances:
+      storeValidation:
+        maxAttempts: 3
+        waitDuration: 300ms
+        retryExceptions:
+          - feign.FeignException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+        ignoreExceptions:
+          - feign.FeignException.NotFound
+          - feign.FeignException.BadRequest
+
 eureka:
   client:
     service-url:

@@ -14,10 +14,12 @@ import java.util.List;
 @Entity
 @Table(name = "tb_stores", schema = "store_service")
 public class Store {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 
     @Column(nullable = false)
     private String name;
@@ -33,6 +35,12 @@ public class Store {
     private Double longitude;
 
     private String phone;
+
+    @Column(name = "average_rating", nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews", nullable = false)
+    private Long totalReviews = 0L;
 
     private boolean active = true; // Para inativar uma loja sem deletar os dados
 

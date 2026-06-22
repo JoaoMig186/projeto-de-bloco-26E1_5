@@ -1,6 +1,6 @@
 package com.infnet.kafka;
 
-import com.infnet.kafka.events.StoreRatingUpdatedEvent;
+import com.infnet.kafka.events.StoreReviewStatsUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaService {
-    private final KafkaTemplate<String, StoreRatingUpdatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, StoreReviewStatsUpdatedEvent> kafkaTemplate;
 
-    private void sendEvent(StoreRatingUpdatedEvent event) {
-        kafkaTemplate.send("icimento.store.rating.updated",
+    private void sendEvent(StoreReviewStatsUpdatedEvent event) {
+        kafkaTemplate.send("icimento.store.review.stats.updated",
                 String.valueOf(event.storeId()),
                 event);
     }
 
     public void sendStoreRatingUpdatedEvent(Long storeId, Double averageRating, Long totalReviews) {
-        StoreRatingUpdatedEvent event = StoreRatingUpdatedEvent.ratingUpdated(storeId, averageRating, totalReviews);
+        StoreReviewStatsUpdatedEvent event = StoreReviewStatsUpdatedEvent.reviewStatsUpdated(storeId, averageRating, totalReviews);
         sendEvent(event);
     }
 }

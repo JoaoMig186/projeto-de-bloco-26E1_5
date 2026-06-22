@@ -13,13 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService service;
+
+    // Reviews no contexto de uma loja
 
     @PostMapping("/store/{storeId}")
     public ResponseEntity<ReviewResponse> create(
@@ -30,16 +31,6 @@ public class ReviewController {
             @RequestBody @Valid CreateReviewRequest request) {
         Review review = service.create(request, storeId, role, authorId, authorName);
         return ResponseEntity.status(HttpStatus.CREATED).body(ReviewResponse.toResponse(review));
-    }
-
-    @PostMapping("/store/{reviewId}/reply")
-    public ResponseEntity<ReviewResponse> reply(
-            @PathVariable("reviewId") UUID reviewId,
-            @RequestHeader("X-User-Role") String role,
-            @RequestHeader("X-User-Id") Long userId,
-            @RequestBody @Valid CreateReplyRequest request) {
-        Review review = service.reply(reviewId, request, role, userId);
-        return ResponseEntity.ok(ReviewResponse.toResponse(review));
     }
 
     @GetMapping("/store/{storeId}")
@@ -54,5 +45,25 @@ public class ReviewController {
     @GetMapping("/store/{storeId}/summary")
     public ResponseEntity<StoreReviewSummaryResponse> getSummary(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(service.getSummary(storeId));
+    }
+
+    // Review individual
+
+    @PostMapping("/{reviewId}/reply")
+    public ResponseEntity<ReviewResponse> reply(
+            @PathVariable("reviewId") Long reviewId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody @Valid CreateReplyRequest request) {
+        Review review = service.reply(reviewId, request, role, userId);
+        return ResponseEntity.ok(ReviewResponse.toResponse(review));
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable("reviewId") Long reviewId,
+            @RequestHeader("X-User-Role") String role) {
+        service.delete(reviewId, role);
+        return ResponseEntity.noContent().build();
     }
 }

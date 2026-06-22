@@ -3,9 +3,9 @@ package com.infnet.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_reviews", schema="review_service")
@@ -34,10 +34,10 @@ public class Review {
     private LocalDateTime createdAt;
 
     @Column(name = "store_reply", length = 500)
-    private String ownerReply;
+    private String storeReply;
 
     @Column(name = "reply_at")
-    private LocalDateTime ownerReplyAt;
+    private LocalDateTime storeReplyAt;
 
     protected Review() {
     }

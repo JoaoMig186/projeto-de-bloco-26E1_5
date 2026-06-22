@@ -5,6 +5,7 @@ import com.infnet.api.exception.StoreNotFoundException;
 import com.infnet.api.exception.StoreUnavailableException;
 import com.infnet.client.StoreClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class StoreServiceImpl implements StoreService {
     private final StoreClient client;
 
-    @Override
     @CircuitBreaker(name = "storeValidation", fallbackMethod = "storeUnavailableFallback")
+    @Retry(name = "storeValidation")
     public ValidacaoStoreResponse validarStore(Long storeId) {
         return client.validarStore(storeId);
     }

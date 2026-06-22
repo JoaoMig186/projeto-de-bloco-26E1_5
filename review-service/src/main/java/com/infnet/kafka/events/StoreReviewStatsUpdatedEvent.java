@@ -3,7 +3,7 @@ package com.infnet.kafka.events;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record StoreRatingUpdatedEvent(
+public record StoreReviewStatsUpdatedEvent(
         String eventId,
         Long storeId,
         Double averageRating,
@@ -11,9 +11,9 @@ public record StoreRatingUpdatedEvent(
         LocalDateTime dateTime,
         String correlationId
 ) {
-    public static StoreRatingUpdatedEvent ratingUpdated(Long storeId, Double averageRating, Long totalReviews) {
+    public static StoreReviewStatsUpdatedEvent reviewStatsUpdated(Long storeId, Double averageRating, Long totalReviews) {
         String correlationId = UUID.randomUUID().toString();
-        return new StoreRatingUpdatedEvent(
+        return new StoreReviewStatsUpdatedEvent(
                 UUID.randomUUID().toString(),
                 storeId,
                 averageRating,
