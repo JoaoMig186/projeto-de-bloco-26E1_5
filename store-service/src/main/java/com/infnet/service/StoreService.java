@@ -1,5 +1,6 @@
 package com.infnet.service;
 
+import com.infnet.dtos.GeocodeResponseDTO;
 import com.infnet.dtos.StoreRequestDTO;
 import com.infnet.dtos.StoreResponseDTO;
 import com.infnet.model.Store;
@@ -28,9 +29,9 @@ public class StoreService {
         store.setName(dto.name());
         store.setCnpj(dto.cnpj());
         store.setAddress(dto.address());
-        store.setPhone(dto.phone());
         store.setLatitude(dto.latitude());
         store.setLongitude(dto.longitude());
+        store.setPhone(dto.phone());
         store.setActive(true);
 
         store = storeRepository.save(store);
@@ -56,5 +57,14 @@ public class StoreService {
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada."));
         store.setActive(false); // Inativação lógica (soft delete) em vez de apagar do banco
         storeRepository.save(store);
+    }
+
+    public GeocodeResponseDTO getStoreGeocode(Long id) {
+        // Busca a loja por ID ou lança uma exceção caso não exista
+        Store store = storeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Loja não encontrada."));
+
+        // Retorna o DTO populado com as coordenadas da entidade
+        return new GeocodeResponseDTO(store.getLatitude(), store.getLongitude());
     }
 }

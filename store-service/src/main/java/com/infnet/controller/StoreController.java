@@ -60,4 +60,12 @@ public class StoreController {
     public ResponseEntity<OrderProductInfoDTO> getProductInfoForOrder(@PathVariable("productId") Long productId) {
         return ResponseEntity.ok(productService.getProductInfoForOrder(productId));
     }
+
+    // Endpoint para consumo do Order Service via OpenFeign
+    @GetMapping("/{id}/geocode")
+    public ResponseEntity<GeocodeResponseDTO> getStoreGeocode(@PathVariable("id") Long id) {
+        // O storeService deverá ter a lógica para ir buscar a loja e devolver as coordenadas
+        GeocodeResponseDTO geocode = storeService.getStoreGeocode(id);
+        return ResponseEntity.ok(geocode);
+    }
 }

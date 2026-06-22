@@ -21,6 +21,4 @@ public class GeocodeService {
         return repository.getStoreGeocode();
     }
 
-
-
 }

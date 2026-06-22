@@ -26,7 +26,7 @@ public class Store {
     private String cnpj;
 
     @Column(nullable = false)
-    private String address; // Pode ser evoluído para uma entidade separada no futuro
+    private String address;
 
     @Column(nullable = false)
     private Double latitude;
@@ -36,7 +36,7 @@ public class Store {
 
     private String phone;
 
-    private boolean active = true; // Para inativar uma loja sem deletar os dados
+    private boolean active = true;
 
     // Uma loja possui vários produtos.
     // Se a loja for removida, os produtos dela também saem (cascade).
