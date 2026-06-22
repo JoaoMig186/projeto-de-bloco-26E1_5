@@ -6,7 +6,6 @@ public record ItemCarrinhoResponseDTO(
         String nomeProduto,
         Integer quantidade,
         Double peso,
-        Boolean fragil,
-        LojaDTO loja
+        Boolean fragil
 ) {
 }

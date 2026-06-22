@@ -1,5 +1,6 @@
 package com.infnet.service;
 
+import com.infnet.domain.ItemOrder;
 import com.infnet.domain.Order;
 import com.infnet.domain.enums.DeliveryStatus;
 import com.infnet.domain.enums.OrderStatus;
@@ -46,8 +47,21 @@ public Order registerOrder(OrderRequestDTO request){
             request.paymentMethod()
     );
 
+    List<ItemOrder> items = cart.itens().stream()
+                    .map(
+                            dto -> new ItemOrder(
+                                    dto.itemId(),
+                                    dto.lojaId(),
+                                    dto.nomeProduto(),
+                                    dto.fragil(),
+                                    dto.peso(),
+                                    dto.quantidade(),
+                                    order
+                            )
+                    ).toList();
+
     order.setProductsPrice(cart.valorTotal());
-    order.setProductList(cart.itens());
+    order.setProductList(items);
 
     GeocodeResponseDTO geocodeUser = userService.getGeocode(request.idUser());
     GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());

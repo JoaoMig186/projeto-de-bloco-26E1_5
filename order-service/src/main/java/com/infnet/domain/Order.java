@@ -15,12 +15,14 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
+@Table(schema = "orders_service", name = "tb_orders")
 public class Order {
 
     @Id
@@ -43,7 +45,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    private List<ItemCarrinhoResponseDTO> productList;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemOrder> productList = new ArrayList<>();
 
     private BigDecimal productsPrice;
 

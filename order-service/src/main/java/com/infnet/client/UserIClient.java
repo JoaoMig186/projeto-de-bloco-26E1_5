@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "${api.endpoints.user}")
 public interface UserIClient {
     @GetMapping("/users/{id}/geocode")
-    GeocodeResponseDTO getGeocode(@PathVariable Long id);
+    GeocodeResponseDTO getGeocode(@PathVariable("id") Long id);
 }
