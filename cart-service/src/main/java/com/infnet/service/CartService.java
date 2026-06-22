@@ -40,8 +40,8 @@ public class CartService {
         return repository.save(cart);
     }
     @Transactional(readOnly = true)
-    public Cart getCart(Long cartId, Long userId) {
-        Cart cart = repository.findById(cartId)
+    public Cart getCart( Long userId) {
+        Cart cart = repository.findByUserIdAndStatus(userId, CartStatus.OPEN)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
 
         if (!cart.getUserId().equals(userId)) {
@@ -51,8 +51,8 @@ public class CartService {
         return cart;
     }
 
-    public Cart addItem(Long cartId, Long userId, AddItemDTO dto) {
-        Cart cart = getCart(cartId, userId);
+    public Cart addItem( Long userId, AddItemDTO dto) {
+        Cart cart = getCart(userId);
 
         if (cart.getStatus() != CartStatus.OPEN) {
             throw new BusinessException("Cart cannot be modified because it is not open.");
@@ -95,8 +95,8 @@ public class CartService {
         return repository.save(cart);
     }
     @Transactional
-    public Cart removeItem(Long cartId, Long userId, Long itemId) {
-        Cart cart = getCart(cartId, userId);
+    public Cart removeItem( Long userId, Long itemId) {
+        Cart cart = getCart( userId);
 
         if (cart.getStatus() != CartStatus.OPEN) {
             throw new BusinessException("Cart cannot be modified because it is not open.");
@@ -108,8 +108,8 @@ public class CartService {
         return repository.save(cart);
     }
     @Transactional
-    public Cart clearCart(Long cartId, Long userId) {
-        Cart cart = getCart(cartId, userId);
+    public Cart clearCart(Long userId) {
+        Cart cart = getCart( userId);
 
         if (cart.getStatus() != CartStatus.OPEN) {
             throw new BusinessException("Cart cannot be modified because it is not open.");
@@ -121,23 +121,19 @@ public class CartService {
         return repository.save(cart);
     }
     @Transactional
-    public Cart finalizeCart(Long cartId, Long userId) {
-        Cart cart = getCart(cartId, userId);
+    public Cart finalizeCart( Long userId) {
+        Cart cart = getCart( userId);
         cart.setStatus(CartStatus.CLOSE);
         metrics.incrementarCarrinhosFinalizados();
         return repository.save(cart);
     }
     @Transactional
     public PagamentoIniciadoEvent getPaymentData(Long userId) {
-        Cart cart = repository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
+        Cart cart = repository.findByUserIdAndStatus(userId, CartStatus.OPEN)
+                .orElseThrow(() -> new ResourceNotFoundException("No open cart found for this user."));
 
         if (cart.getItems().isEmpty()) {
-            throw new BusinessException("Cart is empty.");
-        }
-
-        if (cart.getStatus() != CartStatus.OPEN) {
-            throw new BusinessException("This cart is already being processed or is closed.");
+            throw new BusinessException("Cart is empty. Cannot proceed to payment.");
         }
 
         cart.setStatus(CartStatus.ENVIADOPARAPAGAMENTO);
@@ -156,6 +152,7 @@ public class CartService {
                                 item.getPrice(),
                                 item.getWeight(),
                                 item.getFragile(),
+                                item.getQuantity(),
                                 new StoreDTO(
                                         item.getStore().id(),
                                         item.getStore().name(),
