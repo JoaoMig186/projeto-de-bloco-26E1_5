@@ -12,8 +12,8 @@ import java.util.UUID;
 @Getter@Setter
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "store_id", nullable = false)
     private Long storeId;
