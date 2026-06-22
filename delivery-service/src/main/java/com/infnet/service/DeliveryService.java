@@ -2,11 +2,14 @@ package com.infnet.service;
 
 import com.infnet.domain.entity.Delivery;
 import com.infnet.domain.entity.Driver;
+import com.infnet.domain.entity.enums.DeliveryStatus;
 import com.infnet.dto.request.freight.FreightRequestDTO;
 import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.dto.request.delivery.DeliveryRequestDTO;
 import com.infnet.dto.response.delivery.DeliveryResponseDTO;
+import com.infnet.events.DeliveryUpdatedEvent;
 import com.infnet.exception.ResourceNotFoundException;
+import com.infnet.kafka.DeliveryKafkaProducer;
 import com.infnet.metrics.DeliveryMetrics;
 import com.infnet.repository.DeliveryRepository;
 import com.infnet.repository.DriverRepository;
@@ -20,8 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -32,7 +33,8 @@ public class DeliveryService {
     private final FreightService freightService;
 
     private final DeliveryMetrics metrics;
-    //private final DeliveryEventProducer producer;
+
+    private final DeliveryKafkaProducer producer;
 
     public DeliveryResponseDTO create(
             DeliveryRequestDTO dto
@@ -65,7 +67,6 @@ public class DeliveryService {
 
         driver.becomeUnavailable();
         deliveryRepository.save(delivery);
-        publishStatusChanged(delivery);
         metrics.incrementCreated();
         metrics.recordFreight(
                 delivery.getShippingPrice()
@@ -74,7 +75,7 @@ public class DeliveryService {
     }
 
     @Transactional(readOnly = true)
-    public DeliveryResponseDTO findById(UUID id) {
+    public DeliveryResponseDTO findById(Long id) {
         Delivery delivery = findEntity(id);
         return toResponse(delivery);
     }
@@ -93,16 +94,22 @@ public class DeliveryService {
                 .map(this::toResponse);
     }
 
-    public DeliveryResponseDTO startDelivery(UUID deliveryId) {
+    public DeliveryResponseDTO startDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
 
+        producer.sendDeliveryUpdated(
+                new DeliveryUpdatedEvent(
+                        delivery.getOrderId(),
+                        delivery.getStatus().name()
+                )
+        );
+
         delivery.startDelivery();
-        publishStatusChanged(delivery);
         return toResponse(delivery);
     }
 
-    public DeliveryResponseDTO finishDelivery(UUID deliveryId) {
+    public DeliveryResponseDTO finishDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
 
@@ -114,14 +121,20 @@ public class DeliveryService {
                 )
         );
 
+        producer.sendDeliveryUpdated(
+                new DeliveryUpdatedEvent(
+                        delivery.getOrderId(),
+                        delivery.getStatus().name()
+                )
+        );
+
         driver.becomeAvailable();
         delivery.finishDelivery();
-        publishStatusChanged(delivery);
         metrics.incrementFinished();
         return toResponse(delivery);
     }
 
-    public DeliveryResponseDTO cancel(UUID deliveryId) {
+    public DeliveryResponseDTO cancel(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
 
@@ -137,19 +150,41 @@ public class DeliveryService {
             );
             driver.becomeAvailable();
         }
-        publishStatusChanged(delivery);
+
+        producer.sendDeliveryUpdated(
+                new DeliveryUpdatedEvent(
+                        delivery.getOrderId(),
+                        delivery.getStatus().name()
+                )
+        );
+
         metrics.incrementCancelled();
         return toResponse(delivery);
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         Delivery delivery =
                 findEntity(id);
 
         deliveryRepository.delete(delivery);
     }
 
-    private Delivery findEntity(UUID id) {
+    @Transactional
+    public void startDeliveryFromPayment(Long orderId) {
+
+        Delivery delivery = deliveryRepository.findByOrderId(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Entrega não localizada pelo pedido " + orderId)
+                );
+
+        if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT) {
+            return;
+        }
+
+        delivery.startDelivery();
+    }
+
+    private Delivery findEntity(Long id) {
         return deliveryRepository.findById(id)
             .orElseThrow(() ->
                 new ResourceNotFoundException(
@@ -175,20 +210,5 @@ public class DeliveryService {
                 delivery.getCreatedAt(),
                 delivery.getDeliveredAt()
         );
-    }
-
-    private void publishStatusChanged(
-            Delivery delivery
-    ) {
-
-        /*producer.publishStatusChanged(
-                new DeliveryStatusChangedEvent(
-                        delivery.getId(),
-                        delivery.getOrderId(),
-                        delivery.getDriverId(),
-                        delivery.getStatus(),
-                        LocalDateTime.now()
-                )
-        );*/
     }
 }
