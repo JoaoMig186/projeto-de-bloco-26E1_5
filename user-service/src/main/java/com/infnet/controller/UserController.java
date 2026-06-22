@@ -78,9 +78,8 @@ public class UserController {
 
     @GetMapping("/customers/{customerId}")
     public ResponseEntity<CustomerResponseDTO> getCustomerById(
-            @RequestHeader("Authorization") String authHeader,
             @PathVariable("customerId") Long id){
-        CustomerProfile customer = service.getCustomerById(authHeader, id);
+        CustomerProfile customer = service.getCustomerById(id);
         return ResponseEntity.ok().body(CustomerResponseDTO.toCustomerResponseDTO(customer));
     }
 

@@ -58,3 +58,10 @@ CREATE TABLE IF NOT EXISTS store_service.tb_products (
     ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS store_service.tb_product_events (
+    id UUID PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    event_type VARCHAR(50) NOT NULL,
+    payload JSONB NOT NULL,
+    processed BOOLEAN NOT NULL DEFAULT FALSE
+);
