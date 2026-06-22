@@ -10,3 +10,4 @@ public record PagamentoIniciadoResponseDTO(
         List<ItemCarrinhoResponseDTO> itens
 ) {
 }
+
