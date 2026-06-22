@@ -6,20 +6,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Delivery {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private UUID id;
+    private Long id;
 
-    private UUID orderId;
+    private Long orderId;
 
-    private UUID driverId;
+    private Long driverId;
 
     private String originAddress;
 
@@ -44,7 +43,7 @@ public class Delivery {
     }
 
     public static Delivery create(
-            UUID orderId,
+            Long orderId,
             String originAddress,
             String destinationAddress,
             Double distanceKm,
@@ -77,7 +76,7 @@ public class Delivery {
         return delivery;
     }
 
-    public void assignDriver(UUID driverId) {
+    public void assignDriver(Long driverId) {
 
         if(this.status != DeliveryStatus.CREATED) {
             throw new IllegalStateException(
