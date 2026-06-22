@@ -14,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +28,15 @@ public class CartService {
     private final StoreClient storeClient;
 
     public Cart createCart(Long userId) {
+        if (repository.findByUserIdAndStatus(userId, CartStatus.OPEN).isPresent()) {
+            throw new BusinessException("Usuário já possui um carrinho aberto.");
+        }
         Cart cart = new Cart();
         cart.setUserId(userId);
         cart.setStatus(CartStatus.OPEN);
 
         metrics.incrementarCarrinhosCriados();
+
         return repository.save(cart);
     }
 
@@ -46,7 +54,6 @@ public class CartService {
     public Cart addItem(Long cartId, Long userId, AddItemDTO dto) {
         Cart cart = getCart(cartId, userId);
 
-        // TRAVA: Só pode adicionar se estiver OPEN
         if (cart.getStatus() != CartStatus.OPEN) {
             throw new BusinessException("Cart cannot be modified because it is not open.");
         }

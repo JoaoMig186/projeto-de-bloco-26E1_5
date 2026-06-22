@@ -18,7 +18,7 @@ public class CartController {
 
     @PostMapping
     public ResponseEntity<Cart> createCart(
-            @RequestHeader("X-User-Id") Long userId
+            @RequestHeader(value = "X-User-Id", required = true) Long userId
     ) {
 
         return ResponseEntity
@@ -29,8 +29,7 @@ public class CartController {
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCart(
             @PathVariable("id") Long id,
-            @RequestHeader("X-User-Id") Long userId
-    ) {
+            @RequestHeader(name = "X-User-Id", required = true) Long userId    ) {
 
         return ResponseEntity.ok(
                 service.getCart(id, userId)
@@ -39,7 +38,7 @@ public class CartController {
     @PostMapping("/{id}/items")
     public ResponseEntity<Cart> addItem(
             @PathVariable("id") Long id,
-            @RequestHeader("X-User-Id") Long userId,
+            @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @RequestBody AddItemDTO dto
     ) {
 
@@ -52,7 +51,7 @@ public class CartController {
     public ResponseEntity<Cart> removeItem(
             @PathVariable("id") Long id,
             @PathVariable("itemId") Long itemId,
-            @RequestHeader("X-User-Id") Long userId
+            @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
 
         return ResponseEntity.ok(
@@ -62,7 +61,7 @@ public class CartController {
     @PostMapping("/{id}/finalize")
     public ResponseEntity<Cart> finalizeCart(
             @PathVariable("id") Long id,
-            @RequestHeader("X-User-Id") Long userId
+            @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
         return ResponseEntity.ok(
                 service.finalizeCart(id, userId)
@@ -71,7 +70,7 @@ public class CartController {
     @DeleteMapping("/{id}/clear")
     public ResponseEntity<Cart> clearCart(
             @PathVariable("id") Long id,
-            @RequestHeader("X-User-Id") Long userId
+            @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
 
         return ResponseEntity.ok(
@@ -81,7 +80,7 @@ public class CartController {
 
     @GetMapping("/order")
     public ResponseEntity<PagamentoIniciadoEvent> order(
-            @RequestHeader("X-User-Id") Long userId
+            @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
         return ResponseEntity.ok(
                 service.getPaymentData( userId)
