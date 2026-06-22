@@ -116,16 +116,8 @@ public class UserService {
         return customerRepository.findAll();
     }
 
-    public CustomerProfile getCustomerById(String token, Long id) {
-        Claims claims = jwtService.validateToken(token.split(" ")[1]);
-        Long userId = claims.get("id", Long.class);
-        String tokenRole = claims.get("role",String.class);
-        if(Objects.equals(userId, id) || Role.valueOf(tokenRole) == Role.ADMIN){
-            return customerRepository.findById(id).get();
-        }else {
-            log.warn("Usuário " + claims.getSubject() + " tentando acessar partes do sistema fora do seu escopo");
-            throw new ForbiddenAuthorizationException("Forbidden request for the User");
-        }
+    public CustomerProfile getCustomerById(Long id) {
+        return customerRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Customer not found"));
     }
 
     @Transactional

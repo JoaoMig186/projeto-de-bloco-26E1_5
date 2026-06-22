@@ -21,13 +21,6 @@ spring:
               uri: lb://SEARCH-SERVICE
               predicates:
                 - Path=/icimento/**
-            #- id: store
-            #  uri: lb://STORE
-            #  predicates:
-            #    - Path=/stores/**
-            #  filters:
-            #   - StripPrefix=1
-
 eureka:
   client:
     service-url:

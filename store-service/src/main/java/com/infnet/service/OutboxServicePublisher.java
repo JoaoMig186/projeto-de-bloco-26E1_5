@@ -1,5 +1,8 @@
 package com.infnet.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infnet.dtos.ProductSyncDTO;
 import com.infnet.kafka.KafkaService;
 import com.infnet.model.outbox.OutboxProductEvent;
 import com.infnet.repository.OutboxProductEventRepository;
@@ -16,16 +19,21 @@ public class OutboxServicePublisher {
 
     private final OutboxProductEventRepository outboxRepository;
     private final KafkaService kafkaService;
+    private final ObjectMapper objectMapper;
 
     @Scheduled(fixedDelay = 5000)
     @Transactional
-    public void publishProductEvents(){
+    public void publishProductEvents() throws JsonProcessingException {
         List<OutboxProductEvent> events = outboxRepository.findByProcessedFalse();
 
         for(OutboxProductEvent event : events){
-            kafkaService.sendProductSyncEvent(
-                    String.valueOf(event.getPayload())
+            ProductSyncDTO dto = objectMapper.readValue(
+                    event.getPayload(),
+                    ProductSyncDTO.class
             );
+
+            kafkaService.sendProductSyncEvent(dto);
+
             event.setProcessed(true);
         }
     }
