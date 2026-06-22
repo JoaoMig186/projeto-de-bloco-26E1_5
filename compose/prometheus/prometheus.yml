@@ -25,4 +25,4 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
         - targets:
-            - "order-service:8081"
+            - "order-service:8091"

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "${api.endpoints.delivery}")
 public interface DeliveryIClient {
-    @GetMapping("freight/calculate")
+    @GetMapping("/freight/calculate")
     DeliveryShipResponse getDeliveryPrice(
             @RequestBody FreightRequestDTO dto
     );
