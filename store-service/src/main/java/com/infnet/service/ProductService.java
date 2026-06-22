@@ -1,13 +1,11 @@
 package com.infnet.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infnet.dtos.OrderProductInfoDTO;
 import com.infnet.dtos.ProductRequestDTO;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.ProductSyncDTO;
-import com.infnet.kafka.KafkaService;
 import com.infnet.metrics.StoreMetrics;
 import com.infnet.model.Product;
 import com.infnet.model.Store;
@@ -70,7 +68,9 @@ public class ProductService {
 
         outboxRepository.save(event);
 
-        storeMetrics.incrementProductCreation(product.getCategory().name());
+        storeMetrics.incrementProductCreation();
+
+        storeMetrics.incrementProductCategoryCounter(product.getCategory().name());
 
         return new ProductResponseDTO(product);
     }
@@ -106,23 +106,4 @@ public class ProductService {
                 storeDTO
         );
     }
-
-//    private void syncWithSearchService(Product product, Store store) {
-//        long startTime = System.currentTimeMillis();
-//        ProductSyncDTO syncDTO = new ProductSyncDTO(
-//                product.getId(),
-//                product.getName(),
-//                product.getCategory(),
-//                product.getPrice(),
-//                store.getId(),
-//                store.getName(),
-//                store.getLatitude(),
-//                store.getLongitude()
-//        );
-//
-//        kafkaService.sendProductSyncEvent(syncDTO);
-//
-//        long endTime = System.currentTimeMillis();
-//        storeMetrics.recordKafkaSyncTime(endTime - startTime);
-//    }
 }

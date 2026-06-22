@@ -2,7 +2,7 @@ spring:
   application:
     name: store-service
   profiles:
-    active: prod # <-- Deixe 'dev' para rodar na IDE. Mude para 'prod' quando for subir pelo Docker Compose.
+    active: prod
 
 logging:
   level:
@@ -10,3 +10,11 @@ logging:
     com.infnet: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+management:
+  server:
+    port: 8089
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

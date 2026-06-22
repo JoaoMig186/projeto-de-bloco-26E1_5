@@ -3,8 +3,8 @@ package com.infnet.service;
 import com.infnet.dtos.GeocodeResponseDTO;
 import com.infnet.dtos.StoreRequestDTO;
 import com.infnet.dtos.StoreResponseDTO;
-import com.infnet.events.StoreCreatedEvent; // Importe o Record do Evento
-import com.infnet.kafka.KafkaService; // Importe o Service do Kafka
+import com.infnet.kafka.KafkaService;
+import com.infnet.metrics.StoreMetrics;
 import com.infnet.model.Store;
 import com.infnet.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final KafkaService kafkaService;
+    private final StoreMetrics storeMetrics;
 
     @Transactional
     public StoreResponseDTO createStore(StoreRequestDTO dto) {
@@ -36,7 +37,9 @@ public class StoreService {
 
         store = storeRepository.save(store);
 
-        kafkaService.sendStoreCreatedEvent(store.getId(),store.getAddress());
+        kafkaService.sendStoreCreatedEvent(store.getId(), store.getAddress());
+
+        storeMetrics.incrementStoreCreated();
 
         return new StoreResponseDTO(store);
     }
@@ -60,6 +63,8 @@ public class StoreService {
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada."));
         store.setActive(false);
         storeRepository.save(store);
+
+        storeMetrics.incrementStoreDeactivated();
     }
 
     public GeocodeResponseDTO getStoreGeocode(Long id) {

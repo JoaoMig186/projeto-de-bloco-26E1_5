@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.infnet.dtos.*;
 import com.infnet.service.ProductService;
 import com.infnet.service.StoreService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,9 +65,8 @@ public class StoreController {
 
     // Endpoint para consumo do Order Service via OpenFeign
     @GetMapping("/{id}/geocode")
-    public ResponseEntity<GeocodeResponseDTO> getStoreGeocode(@PathVariable("id") Long id) {
-        // O storeService deverá ter a lógica para ir buscar a loja e devolver as coordenadas
-        GeocodeResponseDTO geocode = storeService.getStoreGeocode(id);
-        return ResponseEntity.ok(geocode);
+    @Timed(value = "http.server.requests.geocode", description = "Tempo de resposta da API de geolocalização")
+    public ResponseEntity<GeocodeResponseDTO> getStoreGeocode(@PathVariable Long id) {
+        return ResponseEntity.ok(storeService.getStoreGeocode(id));
     }
 }

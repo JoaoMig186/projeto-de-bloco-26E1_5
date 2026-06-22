@@ -10,15 +10,13 @@ public record StoreCreatedEvent(
         LocalDateTime dateTime,
         String correlationId
 ) {
-    public static StoreCreatedEvent createEvent(Long storeId,String address){
-        String correlationId = UUID.randomUUID().toString();
+    public static StoreCreatedEvent createEvent(Long storeId, String address) {
         return new StoreCreatedEvent(
                 UUID.randomUUID().toString(),
                 storeId,
                 address,
                 LocalDateTime.now(),
-                correlationId
+                UUID.randomUUID().toString()
         );
     }
 }
-

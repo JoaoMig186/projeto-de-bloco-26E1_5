@@ -41,6 +41,4 @@ public class KafkaService {
         sendStoreEvent(event);
         log.info("Evento de Criação de Loja Enviado com Sucesso");
     }
-
-
 }
