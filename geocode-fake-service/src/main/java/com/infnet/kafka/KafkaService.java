@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaService {
-    // Trocado de <String, GeocodeEvent> para <String, Object> para suportar múltiplos eventos
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static final Logger log = LoggerFactory.getLogger(KafkaService.class);
 
-    // --- FLUXO DO CLIENTE ---
     private void sendUserEvent(UserGeocodeEvent event){
         kafkaTemplate.send("icimento.geocode.customer.scrape",
                 String.valueOf(event.eventId()),
@@ -29,7 +28,6 @@ public class KafkaService {
         log.info("Evento Geocode do Cliente enviado com sucesso");
     }
 
-    // --- FLUXO DA LOJA ---
     private void sendStoreEvent(StoreGeocodeEvent event){
         kafkaTemplate.send("icimento.geocode.store.scrape",
                 String.valueOf(event.eventId()),

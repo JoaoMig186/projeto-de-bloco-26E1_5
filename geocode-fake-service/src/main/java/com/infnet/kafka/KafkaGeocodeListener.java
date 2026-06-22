@@ -25,14 +25,10 @@ public class KafkaGeocodeListener {
         kafkaService.sendUserGeocodeEvent(event.userId(),geocode.getLat(),geocode.getLon());
     }
 
-    @KafkaListener(topics = "icimento.store.created", groupId = "geocode-group")
+    @KafkaListener(topics = "icimento.store.created")
     public void receiveStoreCreatedEvent(StoreCreatedEvent event) {
         log.info("Evento de Criação de Loja recebido com sucesso");
-
-        // Simula o cálculo do geocode baseado no endereço da loja
         Geocode geocode = service.getStoreGeocode(event.address());
-
-        // Retorna o evento para o store-service (você precisará criar este método no KafkaService do geocode)
         kafkaService.sendStoreGeocodeEvent(event.storeId(), geocode.getLat(), geocode.getLon());
     }
 

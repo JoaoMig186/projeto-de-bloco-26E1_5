@@ -1,5 +1,6 @@
 package com.infnet.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.infnet.dtos.*;
 import com.infnet.service.ProductService;
 import com.infnet.service.StoreService;
@@ -44,7 +45,7 @@ public class StoreController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) {
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) throws JsonProcessingException {
         ProductResponseDTO createdProduct = productService.createProduct(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }

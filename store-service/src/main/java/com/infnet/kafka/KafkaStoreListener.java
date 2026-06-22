@@ -1,7 +1,7 @@
 package com.infnet.kafka;
 
-import com.infnet.events.GeocodeEvent;
-import com.infnet.model.Store;
+
+import com.infnet.events.StoreGeocodeEvent;
 import com.infnet.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ public class KafkaStoreListener {
     private final StoreRepository repository;
     private static final Logger log = LoggerFactory.getLogger(KafkaStoreListener.class);
 
-    @KafkaListener(topics = "icimento.geocode.store.scrape", groupId = "store-group")
-    public void receiveGeocodeEvent(GeocodeEvent event) {
+    @KafkaListener(topics = "icimento.geocode.store.scrape")
+    public void receiveGeocodeEvent(StoreGeocodeEvent event) {
         log.info("Evento Geocode da Loja Recebido com Sucesso para Store ID: {}", event.storeId());
 
         // Busca a loja, atualiza as coordenadas e salva
@@ -30,3 +30,5 @@ public class KafkaStoreListener {
         });
     }
 }
+
+

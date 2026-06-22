@@ -34,12 +34,9 @@ public class StoreService {
         store.setPhone(dto.phone());
         store.setActive(true);
 
-        // O save() gera o ID no banco, necessário para enviar no evento Kafka
         store = storeRepository.save(store);
 
-        // Enviar evento via Kafka para o geocode-fake-service
-        StoreCreatedEvent event = new StoreCreatedEvent(store.getId(), store.getAddress());
-        kafkaService.sendStoreCreatedEvent(event);
+        kafkaService.sendStoreCreatedEvent(store.getId(),store.getAddress());
 
         return new StoreResponseDTO(store);
     }
