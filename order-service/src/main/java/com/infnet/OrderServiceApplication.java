@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
+@EnableFeignClients
 @EnableJpaAuditing
-public class UserServiceApplication {
+public class OrderServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UserServiceApplication.class);
+        SpringApplication.run(OrderServiceApplication.class);
     }
-
 }

@@ -44,17 +44,33 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+  # ORDER SERVICE
+  order-service:
+    build: ../order-service
+    container_name: order-service
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   # SEARCH SERVICE
   search-service:
     build: ../search-service
     container_name: search-service
 
+
     networks:
       - icimento-network
 
     depends_on:
       discovery-server:
+        condition: service_healthy
+
+      postgres:
         condition: service_healthy
 
   # GEOCODE-FAKE-SERVICE
