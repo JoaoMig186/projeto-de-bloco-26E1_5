@@ -2,7 +2,7 @@ spring:
   application:
     name: store-service
   profiles:
-    active: prod # <-- Deixe 'dev' para rodar na IDE. Mude para 'prod' quando for subir pelo Docker Compose.
+    active: prod
 
 logging:
   level:

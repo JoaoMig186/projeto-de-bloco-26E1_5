@@ -36,8 +36,6 @@ public class Store {
 
     private boolean active = true;
 
-    // Uma loja possui vários produtos.
-    // Se a loja for removida, os produtos dela também saem (cascade).
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 }

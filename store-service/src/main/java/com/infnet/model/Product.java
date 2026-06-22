@@ -34,7 +34,7 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Category category; // Ex: "Pisos", "Cimentos", "Ferragens"
+    private Category category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,7 +43,6 @@ public class Product {
     @Column(nullable = false)
     private Double weight;
 
-    // Muitos produtos pertencem a uma única loja
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;

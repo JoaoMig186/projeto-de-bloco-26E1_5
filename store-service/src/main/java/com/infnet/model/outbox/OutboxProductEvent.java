@@ -1,6 +1,5 @@
 package com.infnet.model.outbox;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.infnet.model.enums.ProductEventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
