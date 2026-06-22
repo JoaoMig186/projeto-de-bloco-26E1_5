@@ -16,8 +16,8 @@ public class UserServiceImpl implements UserService {
     private final UserIClient client;
 
     @Override
-    @Retry(name = "deliveryService")
-    @CircuitBreaker(name = "deliveryService", fallbackMethod = "fallBackGeocode")
+    @CircuitBreaker(name = "userService", fallbackMethod = "fallBackGeocode")
+    @Retry(name = "userService")
     public GeocodeResponseDTO getGeocode(Long id) {
         return client.getGeocode(id);
     }
