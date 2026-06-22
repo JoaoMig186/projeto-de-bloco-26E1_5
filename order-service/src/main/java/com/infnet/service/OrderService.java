@@ -40,22 +40,6 @@ public class OrderService {
 public Order registerOrder(OrderRequestDTO request){
 
     PagamentoIniciadoResponseDTO cart = cartService.getCart(request.idUser());
-
-    System.out.println("===== CARRINHO =====");
-    System.out.println("Carrinho ID: " + cart.carrinhoId());
-    System.out.println("Valor Total: " + cart.valorTotal());
-    System.out.println("Peso Total: " + cart.valorTotalKg());
-    System.out.println("Quantidade de itens: " + cart.itens().size());
-
-    cart.itens().forEach(item -> {
-        System.out.println("----- ITEM -----");
-        System.out.println("Item ID: " + item.itemId());
-        System.out.println("Store ID: " + item.storeId());
-        System.out.println("Produto: " + item.productName());
-        System.out.println("Quantidade: " + item.quantity());
-        System.out.println("Peso: " + item.weight());
-        System.out.println("Frágil: " + item.fragile());
-    });
     Order order = new Order(
             request.idUser(),
             request.idStore(),
