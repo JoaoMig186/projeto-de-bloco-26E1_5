@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/deliveries")
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class DeliveryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DeliveryResponseDTO> findById(
-            @PathVariable("id") UUID id
+            @PathVariable("id") Long id
     ) {
         return ResponseEntity.ok(
                 service.findById(id)
@@ -48,7 +46,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/start")
     public ResponseEntity<DeliveryResponseDTO> start(
-            @PathVariable("id") UUID id
+            @PathVariable("id") Long id
     ) {
         return ResponseEntity.ok(
                 service.startDelivery(id)
@@ -57,7 +55,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/finish")
     public ResponseEntity<DeliveryResponseDTO> finish(
-            @PathVariable("id") UUID id
+            @PathVariable("id") Long id
     ) {
         return ResponseEntity.ok(
                 service.finishDelivery(id)
@@ -66,7 +64,7 @@ public class DeliveryController {
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<DeliveryResponseDTO> cancel(
-            @PathVariable("id") UUID id
+            @PathVariable("id") Long id
     ) {
         return ResponseEntity.ok(
                 service.cancel(id)
@@ -75,7 +73,7 @@ public class DeliveryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable("id") UUID id
+            @PathVariable("id") Long id
     ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
