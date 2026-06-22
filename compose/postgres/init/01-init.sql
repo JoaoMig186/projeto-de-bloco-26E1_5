@@ -57,3 +57,4 @@ CREATE TABLE IF NOT EXISTS store_service.tb_products (
     REFERENCES store_service.tb_stores(id)
     ON DELETE CASCADE
 );
+

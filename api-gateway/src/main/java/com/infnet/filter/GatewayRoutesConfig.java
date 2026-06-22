@@ -29,6 +29,32 @@ public class GatewayRoutesConfig {
                     .route(path("/reviews/**").and(method(HttpMethod.POST)), http())
                     .filter(lb("REVIEW-SERVICE"))
                     .filter(filter.authFilter())
-                    .build());
+                    .build()
+                .and(route("authenticated-cart")
+                    .route(path("/carts/**"), http())
+                    .filter(lb("CART-SERVICE"))
+                    .filter(filter.authFilter())
+                    .build()
+                .and(route("authenticated-delivery")
+                    .route(path("/deliveries/**"), http())
+                    .filter(lb("DELIVERY-SERVICE"))
+                    .filter(filter.authFilter())
+                    .build()
+                .and(route("authenticated-drivers")
+                    .route(path("/drivers/**"), http())
+                    .filter(lb("DELIVERY-SERVICE"))
+                    .filter(filter.authFilter())
+                    .build()
+                .and(route("authenticated-freight")
+                    .route(path("/freight/**"), http())
+                    .filter(lb("DELIVERY-SERVICE"))
+                    .filter(filter.authFilter())
+                    .build()
+                .and(route("authenticated-order")
+                    .route(path("/orders/**"), http())
+                    .filter(lb("ORDER-SERVICE"))
+                    .filter(filter.authFilter())
+                    .build()))))));
+
     }
 }
