@@ -155,7 +155,7 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
 
         kafkaProducerService.sendPaymentApprovatedEvent(
                 new PaymentApprovatedEvent(
-                        order.getId(), true
+                        saved.getId(), true
                 )
         );
 
