@@ -1,0 +1,63 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: order-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: com.infnet.kafka.events
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+api:
+  endpoints:
+    user: USER-SERVICE
+    store: STORE-SERVICE
+    payment: PAYMENT-SERVICE
+    delivery: DELIVERY-SERVICE
+    cart: CART-SERVICE
+
+resilience4j:
+  retry:
+    instances:
+      deliveryService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - feign.FeignException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+  circuitbreaker:
+    instances:
+      deliveryService:
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2

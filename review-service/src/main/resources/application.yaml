@@ -2,7 +2,7 @@ spring:
   application:
     name: review-service
   profiles:
-    active: dev
+    active: prod
 
 api:
   endpoints:

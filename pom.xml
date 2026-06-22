@@ -20,6 +20,7 @@
         <module>delivery-service</module>
         <module>cart-service</module>
         <module>search-service</module>
+        <module>order-service</module>
     </modules>
     <packaging>pom</packaging>
     <properties>

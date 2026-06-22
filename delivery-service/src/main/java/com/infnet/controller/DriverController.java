@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/drivers")
 @RequiredArgsConstructor
@@ -48,7 +46,7 @@ public class DriverController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DriverResponseDTO> findById(
-            @PathVariable UUID id
+            @PathVariable Long id
             ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -78,7 +76,7 @@ public class DriverController {
 
     @PutMapping("/{id}")
     public ResponseEntity<DriverResponseDTO> update(
-            @PathVariable UUID id,
+            @PathVariable Long id,
             @Valid @RequestBody DriverUpdateDTO dto
     ) {
 
@@ -89,7 +87,7 @@ public class DriverController {
 
     @PatchMapping("/{id}/availability")
     public ResponseEntity<DriverResponseDTO> setAvailable(
-            @PathVariable UUID id
+            @PathVariable Long id
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -98,7 +96,7 @@ public class DriverController {
 
     @PatchMapping("/{id}/unavailable")
     public ResponseEntity<DriverResponseDTO> setUnavailable(
-            @PathVariable UUID id
+            @PathVariable Long id
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -107,7 +105,7 @@ public class DriverController {
 
     @PatchMapping("/{id}/location")
     public ResponseEntity<DriverResponseDTO> updateLocation(
-            @PathVariable UUID id,
+            @PathVariable Long id,
             @Valid @RequestBody DriverLocationUpdateDTO dto
     ) {
         return ResponseEntity
@@ -117,7 +115,7 @@ public class DriverController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable UUID id
+            @PathVariable Long id
     ) {
         service.delete(id);
         return ResponseEntity.noContent().build();

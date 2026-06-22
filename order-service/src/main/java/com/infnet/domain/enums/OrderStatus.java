@@ -1,0 +1,5 @@
+package com.infnet.domain.enums;
+
+public enum OrderStatus {
+    CREATED, AWAITING_PAYMENT, PAID, IN_PREPARATION, IN_TRANSIT, DELIVERED, CANCELED, REFUSED, CALCULATING_SHIPPING
+}

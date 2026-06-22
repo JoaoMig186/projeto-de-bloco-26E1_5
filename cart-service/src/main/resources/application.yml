@@ -42,3 +42,23 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+resilience4j:
+  retry:
+    instances:
+      cartService:
+        max-attempts: 3
+        wait-duration: 2s
+        retry-exceptions:
+          - java.lang.Exception
+
+  circuitbreaker:
+    instances:
+      cartService:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true

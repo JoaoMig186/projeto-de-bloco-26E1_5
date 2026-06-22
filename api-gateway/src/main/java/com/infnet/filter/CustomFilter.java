@@ -29,12 +29,11 @@ public class CustomFilter {
             }
             String token = authorization.split(" ")[1];
             Claims claims = jwtService.validateToken(token);
-
+            String userId = String.valueOf(claims.get("id"));
             ServerRequest roleRequest = ServerRequest.from(request)
                     .header("X-User-Role", claims.get("role", String.class))
-                    .header("X-User-Id", claims.getId())
-                    //.header("X-User-Id", String.valueOf(claims.get("id", Long.class)))
                     .header("X-User-Name", claims.get("name", String.class))
+                    .header("X-User-Id", userId)
                     .build();
 
             return next.handle(roleRequest);
