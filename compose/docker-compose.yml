@@ -48,27 +48,31 @@ services:
   order-service:
     build: ../order-service
     container_name: order-service
-
-<<<<<<< HEAD
-=======
-  # SEARCH SERVICE
-  search-service:
-    build: ../search-service
-    container_name: search-service
-
->>>>>>> f07017c314e1d39d6c80f5f88b1d5cb00c709d17
     networks:
       - icimento-network
 
     depends_on:
       discovery-server:
         condition: service_healthy
-<<<<<<< HEAD
       postgres:
         condition: service_healthy
-=======
 
->>>>>>> f07017c314e1d39d6c80f5f88b1d5cb00c709d17
+  # SEARCH SERVICE
+  search-service:
+    build: ../search-service
+    container_name: search-service
+
+
+    networks:
+      - icimento-network
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+      postgres:
+        condition: service_healthy
+
   # GEOCODE-FAKE-SERVICE
   geocode-fake-service:
     build: ../geocode-fake-service

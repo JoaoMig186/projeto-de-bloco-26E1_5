@@ -5,9 +5,6 @@ CREATE SCHEMA IF NOT EXISTS cart_service;
 CREATE SCHEMA IF NOT EXISTS delivery_service;
 CREATE SCHEMA IF NOT EXISTS orders_service;
 
-<<<<<<< HEAD
-
-=======
 CREATE TABLE IF NOT EXISTS user_service.tb_users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255),
@@ -60,4 +57,4 @@ CREATE TABLE IF NOT EXISTS store_service.tb_products (
     REFERENCES store_service.tb_stores(id)
     ON DELETE CASCADE
 );
->>>>>>> f07017c314e1d39d6c80f5f88b1d5cb00c709d17
+
