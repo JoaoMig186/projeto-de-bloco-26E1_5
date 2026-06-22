@@ -2,7 +2,7 @@ spring:
   application:
     name: search-service
   profiles:
-    active: dev
+    active: prod
 
 security:
   private-key: classpath:keys/private_key.pem

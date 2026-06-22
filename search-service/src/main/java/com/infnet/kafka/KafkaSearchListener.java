@@ -29,8 +29,6 @@ public class KafkaSearchListener {
             ProductSyncDTO product =
                     objectMapper.readValue(payload, ProductSyncDTO.class);
 
-            log.info("DTO convertido: {}", product);
-
             ProductDocument document = new ProductDocument(
                     product.id(),
                     product.name(),
@@ -38,8 +36,8 @@ public class KafkaSearchListener {
                     product.price(),
                     product.storeId(),
                     product.storeName(),
-                    product.category().toString(),
-                    product.durability().toString()
+                    product.category(),
+                    product.durability()
             );
 
             productRepository.save(document);

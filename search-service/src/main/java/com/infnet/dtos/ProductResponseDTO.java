@@ -2,7 +2,6 @@ package com.infnet.dtos;
 
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.infnet.model.ProductDocument;
-import com.infnet.model.enums.Category;
 
 import java.math.BigDecimal;
 
@@ -13,6 +12,7 @@ public record ProductResponseDTO(
         String category,
         String durability,
         BigDecimal price,
+        Long storeId,
         String storeName,
         Double score
 ) {
@@ -25,6 +25,7 @@ public record ProductResponseDTO(
                 doc.getCategory(),
                 doc.getDurability(),
                 doc.getPrice(),
+                doc.getStoreId(),
                 doc.getStoreName(),
                 hit.score()
         );
