@@ -12,31 +12,11 @@ spring:
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/users/**
-            - id: cart-service
-              uri: lb://CART-SERVICE
-              predicates:
-                - Path=/carts/**
             - id: review-service
               uri: lb://REVIEW-SERVICE
               predicates:
                 - Path=/reviews/**
                 - Method=GET
-
-            - id: delivery-service-deliveries
-              uri: lb://DELIVERY-SERVICE
-              predicates:
-                - Path=/deliveries/**
-
-            - id: delivery-service-drivers
-              uri: lb://DELIVERY-SERVICE
-              predicates:
-                - Path=/drivers/**
-
-            - id: delivery-service-freight
-              uri: lb://DELIVERY-SERVICE
-              predicates:
-                - Path=/freight/**
-
             - id: search-service
               uri: lb://SEARCH-SERVICE
               predicates:
