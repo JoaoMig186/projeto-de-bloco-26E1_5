@@ -32,7 +32,8 @@ public class CustomFilter {
 
             ServerRequest roleRequest = ServerRequest.from(request)
                     .header("X-User-Role", claims.get("role", String.class))
-                    .header("X-User-Id", claims.getId())
+                    .header("X-User-Id", String.valueOf(claims.get("id", Long.class)))
+                    .header("X-User-Name", claims.get("name", String.class))
                     .build();
 
             return next.handle(roleRequest);

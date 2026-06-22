@@ -32,7 +32,7 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ReviewResponse.toResponse(review));
     }
 
-    @PostMapping("/{reviewId}/reply")
+    @PostMapping("/store/{reviewId}/reply")
     public ResponseEntity<ReviewResponse> reply(
             @PathVariable("reviewId") UUID reviewId,
             @RequestHeader("X-User-Role") String role,

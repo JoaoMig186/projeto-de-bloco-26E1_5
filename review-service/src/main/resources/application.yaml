@@ -1,10 +1,13 @@
 spring:
   application:
     name: review-service
+  profiles:
+    active: dev
 
 api:
   endpoints:
     store: STORE-SERVICE
+
 resilience4j:
   circuitbreaker:
     instances:
@@ -19,4 +22,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health, info, metrics, prometheus

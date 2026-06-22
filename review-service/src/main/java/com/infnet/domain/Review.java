@@ -39,9 +39,11 @@ public class Review {
     @Column(name = "reply_at")
     private LocalDateTime ownerReplyAt;
 
-    protected Review() {}
+    protected Review() {
+    }
 
-    public Review(Long storeId, Long authorId, String authorName, Integer rating, String comment, LocalDateTime createdAt) {
+    public Review(Long storeId, Long authorId, String authorName,
+                  Integer rating, String comment, LocalDateTime createdAt) {
         this.storeId = storeId;
         this.authorId = authorId;
         this.authorName = authorName;
