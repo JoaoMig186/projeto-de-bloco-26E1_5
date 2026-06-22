@@ -10,14 +10,13 @@ import com.infnet.config.exception.BusinessException;
 import com.infnet.config.exception.ResourceNotFoundException;
 import com.infnet.config.exception.AccessDeniedException;
 import com.infnet.config.client.StoreClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +26,7 @@ public class CartService {
     private final CartRepository repository;
     private final StoreClient storeClient;
 
+    @Transactional
     public Cart createCart(Long userId) {
         if (repository.findByUserIdAndStatus(userId, CartStatus.OPEN).isPresent()) {
             throw new BusinessException("Usuário já possui um carrinho aberto.");
@@ -39,7 +39,7 @@ public class CartService {
 
         return repository.save(cart);
     }
-
+    @Transactional(readOnly = true)
     public Cart getCart(Long cartId, Long userId) {
         Cart cart = repository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
@@ -94,7 +94,7 @@ public class CartService {
 
         return repository.save(cart);
     }
-
+    @Transactional
     public Cart removeItem(Long cartId, Long userId, Long itemId) {
         Cart cart = getCart(cartId, userId);
 
@@ -107,7 +107,7 @@ public class CartService {
 
         return repository.save(cart);
     }
-
+    @Transactional
     public Cart clearCart(Long cartId, Long userId) {
         Cart cart = getCart(cartId, userId);
 
@@ -120,12 +120,14 @@ public class CartService {
 
         return repository.save(cart);
     }
+    @Transactional
     public Cart finalizeCart(Long cartId, Long userId) {
         Cart cart = getCart(cartId, userId);
         cart.setStatus(CartStatus.CLOSE);
         metrics.incrementarCarrinhosFinalizados();
         return repository.save(cart);
     }
+    @Transactional
     public PagamentoIniciadoEvent getPaymentData(Long userId) {
         Cart cart = repository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found."));
@@ -164,4 +166,5 @@ public class CartService {
                         .toList()
         );
     }
+
 }
