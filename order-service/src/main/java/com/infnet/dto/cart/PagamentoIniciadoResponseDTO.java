@@ -5,9 +5,8 @@ import java.util.List;
 
 public record PagamentoIniciadoResponseDTO(
         Long carrinhoId,
-        Long usuarioId,
         BigDecimal valorTotal,
-        List<ItemCarrinhoResponseDTO> itens,
-        BigDecimal pesoTotalCart
+        BigDecimal valorTotalKg,
+        List<ItemCarrinhoResponseDTO> itens
 ) {
 }

@@ -119,11 +119,11 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
                 .map(
                         dto -> new ItemOrder(
                                 dto.itemId(),
-                                dto.lojaId(),
-                                dto.nomeProduto(),
-                                dto.fragil(),
-                                dto.peso(),
-                                dto.quantidade(),
+                                dto.storeId(),
+                                dto.productName(),
+                                dto.fragile(),
+                                dto.weight(),
+                                dto.quantity(),
                                 order
                         )
                 ).toList();
@@ -136,7 +136,7 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
 
         FreightRequestDTO dto = new FreightRequestDTO(
                 haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()),
-                cart.pesoTotalCart()
+                cart.valorTotalKg()
         );
 
         DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
