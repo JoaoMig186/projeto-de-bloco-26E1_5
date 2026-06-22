@@ -8,13 +8,21 @@ scrape_configs:
     static_configs:
       - targets:
           - "delivery-service:8082"
+
   - job_name: "user-service"
     metrics_path: /actuator/prometheus
     static_configs:
       - targets:
           - "user-service:8081"
+
   - job_name: "cart-service"
     metrics_path: /actuator/prometheus
     static_configs:
         - targets:
             - "cart-service:8086"
+
+  - job_name: "order-service"
+    metrics_path: /actuator/prometheus
+    static_configs:
+        - targets:
+            - "order-service:8091"

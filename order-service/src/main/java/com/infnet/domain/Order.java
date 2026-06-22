@@ -1,5 +1,6 @@
 package com.infnet.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.infnet.domain.enums.DeliveryStatus;
 import com.infnet.domain.enums.OrderStatus;
 import com.infnet.domain.enums.PaymentMethod;

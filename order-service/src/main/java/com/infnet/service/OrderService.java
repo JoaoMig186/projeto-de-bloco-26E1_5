@@ -14,12 +14,15 @@ import com.infnet.excepton.OrderNotFoundException;
 import com.infnet.kafka.KafkaProducerService;
 import com.infnet.kafka.events.OrderCreatedEvent;
 import com.infnet.kafka.events.PaymentApprovatedEvent;
+import com.infnet.metrics.OrderMetrics;
 import com.infnet.repository.OrderRepository;
 import com.infnet.service.cart.CartService;
 import com.infnet.service.delivery.DeliveryService;
 import com.infnet.service.store.StoreService;
 import com.infnet.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,67 +39,143 @@ public class OrderService {
     private final UserService userService;
     private final StoreService storeService;
     private final KafkaProducerService kafkaProducerService;
+    private final OrderMetrics orderMetrics;
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
-public Order registerOrder(OrderRequestDTO request){
+//Sem metrica
+//public Order registerOrder(OrderRequestDTO request, Long userId){
+//
+//    PagamentoIniciadoResponseDTO cart = cartService.getCart(userId);
+//
+//    Order order = new Order(
+//            userId,
+//            request.idStore(),
+//            cart.carrinhoId(),
+//            request.paymentMethod()
+//    );
+//
+//    List<ItemOrder> items = cart.itens().stream()
+//                    .map(
+//                            dto -> new ItemOrder(
+//                                    dto.itemId(),
+//                                    dto.lojaId(),
+//                                    dto.nomeProduto(),
+//                                    dto.fragil(),
+//                                    dto.peso(),
+//                                    dto.quantidade(),
+//                                    order
+//                            )
+//                    ).toList();
+//
+//    order.setProductsPrice(cart.valorTotal());
+//    order.setProductList(items);
+//
+//    GeocodeResponseDTO geocodeUser = userService.getGeocode(userId);
+//    GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
+//
+//    FreightRequestDTO dto = new FreightRequestDTO(
+//            haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()), // passar a lat1, lat2, lon1, lon2
+//            cart.pesoTotalCart()
+//    );
+//
+//    DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
+//    order.setShippingPrice(deliveryShipResponse.freightValue());
+//
+//    BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
+//    order.setTotalPrice(totalPrice);
+//
+//    Order saved = orderRepository.save(order);
+//
+//    kafkaProducerService.sendOrderCreatedEvent(
+//            new OrderCreatedEvent(
+//                    saved.getId(),
+//                    saved.getIdStore(),
+//                    saved.getIdUser(),
+//                    saved.getTotalPrice(),
+//                    saved.getPaymentMethod()
+//            )
+//    );
+//
+//    incrementarPedidosCriados();
+//    return saved;
+//}
 
-    PagamentoIniciadoResponseDTO cart = cartService.getCart(request.idUser());
-    Order order = new Order(
-            request.idUser(),
-            request.idStore(),
-            cart.carrinhoId(),
-            request.paymentMethod()
-    );
+// Com metrica
+public Order registerOrder(OrderRequestDTO request, Long userId){
+    log.info("[ORDER] Iniciando criação de pedido - userId={}, idStore={}", userId, request.idStore());
+    return orderMetrics.medirTempoDePedido(() -> {
 
-    List<ItemOrder> items = cart.itens().stream()
-                    .map(
-                            dto -> new ItemOrder(
-                                    dto.itemId(),
-                                    dto.storeId(),
-                                    dto.productName(),
-                                    dto.fragile(),
-                                    dto.weight(),
-                                    dto.quantity(),
-                                    order
-                            )
-                    ).toList();
+        PagamentoIniciadoResponseDTO cart = cartService.getCart(userId);
+        log.info("[ORDER] Carrinho obtido - carrinhoId={}, total={}, itens={}",
+                cart.carrinhoId(), cart.valorTotal(), cart.itens().size());
+        Order order = new Order(
+                userId,
+                request.idStore(),
+                cart.carrinhoId(),
+                request.paymentMethod()
+        );
 
-    order.setProductsPrice(cart.valorTotal());
-    order.setProductList(items);
+        List<ItemOrder> items = cart.itens().stream()
+                .map(
+                        dto -> new ItemOrder(
+                                dto.itemId(),
+                                dto.storeId(),
+                                dto.productName(),
+                                dto.fragile(),
+                                dto.weight(),
+                                dto.quantity(),
+                                order
+                        )
+                ).toList();
 
-    GeocodeResponseDTO geocodeUser = userService.getGeocode(request.idUser());
-    GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
+        order.setProductsPrice(cart.valorTotal());
+        order.setProductList(items);
 
-    FreightRequestDTO dto = new FreightRequestDTO(
-            haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()), // passar a lat1, lat2, lon1, lon2
-            cart.valorTotalKg()
-    );
+        GeocodeResponseDTO geocodeUser = userService.getGeocode(userId);
+        GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
 
-    DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
-    order.setShippingPrice(deliveryShipResponse.freightValue());
+        FreightRequestDTO dto = new FreightRequestDTO(
+                haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()),
+                cart.valorTotalKg()
+        );
 
-    BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
-    order.setTotalPrice(totalPrice);
+        DeliveryShipResponse deliveryShipResponse = deliveryService.getDeliveryPrice(dto);
+        log.info("[ORDER] Frete calculado - valor={}", deliveryShipResponse.freightValue());
+        order.setShippingPrice(deliveryShipResponse.freightValue());
 
-    Order saved = orderRepository.save(order);
+        BigDecimal totalPrice = order.getProductsPrice().add(order.getShippingPrice());
+        order.setTotalPrice(totalPrice);
 
-    kafkaProducerService.sendOrderCreatedEvent(
-            new OrderCreatedEvent(
-                    saved.getId(),
-                    saved.getIdStore(),
-                    saved.getIdUser(),
-                    saved.getTotalPrice(),
-                    saved.getPaymentMethod()
-            )
-    );
+        Order saved = orderRepository.save(order);
+        log.info("[ORDER] Pedido salvo - orderId={}, total={}", saved.getId(), saved.getTotalPrice());
 
-    return saved;
+        kafkaProducerService.sendOrderCreatedEvent(
+                new OrderCreatedEvent(
+                        saved.getId(),
+                        saved.getIdStore(),
+                        saved.getIdUser(),
+                        saved.getTotalPrice(),
+                        saved.getPaymentMethod()
+                )
+        );
+        log.info("[ORDER] Evento OrderCreated enviado - orderId={}", saved.getId());
+
+        incrementarPedidosCriados();
+        return saved;
+    });
 }
+
 
 //  ✅ Metodo Kafka
     @Transactional
     public void updateStatusPayment(Long orderId, String paymentStatus){
+        log.info("[ORDER] Atualizando status de pagamento - orderId={}, status={}", orderId, paymentStatus);
+
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+                .orElseThrow(() -> {
+                    log.warn("[ORDER] Pedido não encontrado - orderId={}", orderId);
+                    return new OrderNotFoundException("Order not found");
+                });
 
         PaymentStatus status = PaymentStatus.valueOf(paymentStatus);
 
@@ -106,8 +185,10 @@ public Order registerOrder(OrderRequestDTO request){
                             order.getId(), true
                     )
             );
+            log.info("[ORDER] Pagamento aprovado, evento enviado - orderId={}", orderId);
             order.setPaymentStatus(status);
         } else {
+            log.warn("[ORDER] Pagamento não aprovado - orderId={}, status={}", orderId, status);
             order.setPaymentStatus(status);
         }
 
@@ -117,11 +198,16 @@ public Order registerOrder(OrderRequestDTO request){
 //    ✅ Metodo Kafka
     @Transactional
     public void updateStatusDelivery(Long orderId, String deliveryStatus){
+        log.info("[ORDER] Atualizando status de entrega - orderId={}, status={}", orderId, deliveryStatus);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+                .orElseThrow(() ->{
+                    log.warn("[ORDER] Pedido não encontrado - orderId={}", orderId);
+                    return new OrderNotFoundException("Order not found");
+                });
 
         DeliveryStatus status = DeliveryStatus.valueOf(deliveryStatus);
         order.setDeliveryStatus(status);
+        log.info("[ORDER] Status de entrega atualizado - orderId={}, status={}", orderId, status);
     }
 
 public Order findById(Long id){
@@ -148,5 +234,9 @@ public void deleteById(Long id){
 
         Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    private void incrementarPedidosCriados(){
+        orderMetrics.incrementPedidosCriados();
     }
 }

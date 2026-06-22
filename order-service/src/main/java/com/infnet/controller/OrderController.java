@@ -27,8 +27,8 @@ public class OrderController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<Order> registrerOrder(@RequestBody OrderRequestDTO request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.registerOrder(request));
+    public ResponseEntity<Order> registrerOrder(@RequestBody OrderRequestDTO request, @RequestHeader("X-User-Id") Long userId){
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.registerOrder(request, userId));
     }
 
 //    Delete
