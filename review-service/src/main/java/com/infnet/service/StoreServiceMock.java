@@ -11,7 +11,7 @@ public class StoreServiceMock implements StoreService {
     public ValidacaoStoreResponse validarStore(Long storeId) {
         return new ValidacaoStoreResponse(
                 storeId,
-                1L
+                3L
         );
     }
 }

@@ -9,7 +9,9 @@ api:
     store: STORE-SERVICE
 
 management:
+  server:
+    port: 8087
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, prometheus
+        include: health,info,metrics,prometheus

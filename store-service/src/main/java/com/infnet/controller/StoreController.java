@@ -45,7 +45,7 @@ public class StoreController {
 
     // Rota para o Review Service validar se a loja existe
     @GetMapping("/{id}/validation")
-    public ResponseEntity<ValidacaoStoreResponse> validateStore(@PathVariable("id")  Long id) {
+    public ResponseEntity<ValidacaoStoreResponse> validateStore(@PathVariable("id") Long id) {
         return ResponseEntity.ok(storeService.validateStore(id));
     }
 

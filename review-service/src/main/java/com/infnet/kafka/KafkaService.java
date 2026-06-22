@@ -1,6 +1,6 @@
 package com.infnet.kafka;
 
-import com.infnet.kafka.events.StoreReviewStatsUpdatedEvent;
+import com.infnet.events.StoreReviewStatsUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

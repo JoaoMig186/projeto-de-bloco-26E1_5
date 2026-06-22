@@ -1,4 +1,4 @@
-package com.infnet.kafka.events;
+package com.infnet.events;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

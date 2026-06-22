@@ -1,3 +1,6 @@
+server:
+  port: 0
+
 spring:
   application:
     name: review-service
@@ -50,6 +53,3 @@ eureka:
       defaultZone: http://discovery-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-
-server:
-  port: 0

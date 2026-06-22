@@ -246,15 +246,6 @@ services:
     networks:
       - icimento-network
 
-  #ZIPKIN
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      - icimento-network
-
   elasticsearch-db:
     image: elasticsearch:8.19.2
     container_name: elasticsearch-db

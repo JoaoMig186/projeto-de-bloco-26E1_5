@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "${api.endpoints.store}")
 public interface StoreClient {
-    @GetMapping("/stores/{id}/validations")
+    @GetMapping("/stores/{id}/validation")
     ValidacaoStoreResponse validarStore(@PathVariable("id") Long id);
 }

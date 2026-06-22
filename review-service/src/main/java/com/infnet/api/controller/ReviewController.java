@@ -20,8 +20,6 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService service;
 
-    // Reviews no contexto de uma loja
-
     @PostMapping("/store/{storeId}")
     public ResponseEntity<ReviewResponse> create(
             @PathVariable("storeId") Long storeId,
@@ -46,8 +44,6 @@ public class ReviewController {
     public ResponseEntity<StoreReviewSummaryResponse> getSummary(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(service.getSummary(storeId));
     }
-
-    // Review individual
 
     @PostMapping("/{reviewId}/reply")
     public ResponseEntity<ReviewResponse> reply(

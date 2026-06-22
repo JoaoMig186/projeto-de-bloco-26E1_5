@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class KafkaStoreRatingListener {
+public class KafkaStoreReviewStatsListener {
     private final StoreRepository repository;
 
     @KafkaListener(topics = "icimento.store.review.stats.updated")

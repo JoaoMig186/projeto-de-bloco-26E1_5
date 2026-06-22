@@ -25,4 +25,10 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
       - targets:
-          - "host.docker.internal:8087"
+          - "review-service:8087"
+
+  - job_name: "store-service"
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - "review-service:8088"
