@@ -1,7 +1,8 @@
 spring:
   application:
     name: review-service
-
+  profiles:
+    active: prod
 api:
   endpoints:
     store: STORE-SERVICE

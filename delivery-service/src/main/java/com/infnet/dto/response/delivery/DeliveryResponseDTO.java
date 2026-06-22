@@ -3,15 +3,14 @@ package com.infnet.dto.response.delivery;
 import com.infnet.domain.entity.enums.DeliveryStatus;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public record DeliveryResponseDTO(
 
-    UUID id,
+    Long id,
 
-    UUID orderId,
+    Long orderId,
 
-    UUID driverId,
+    Long driverId,
 
     String originAddress,
 

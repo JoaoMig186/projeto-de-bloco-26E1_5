@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Profile({"dev"})
+@Profile({"prod"})
 public class UserServiceImpl implements UserService {
     private final UserIClient client;
 

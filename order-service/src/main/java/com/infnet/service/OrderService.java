@@ -29,21 +29,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-    OrderRepository orderRepository;
-    DeliveryService deliveryService;
-    CartService cartService;
-    UserService userService;
-    StoreService storeService;
-    KafkaProducerService kafkaProducerService;
+
+    private final OrderRepository orderRepository;
+    private final DeliveryService deliveryService;
+    private final CartService cartService;
+    private final UserService userService;
+    private final StoreService storeService;
+    private final KafkaProducerService kafkaProducerService;
 
 public Order registerOrder(OrderRequestDTO request){
 
-    PagamentoIniciadoResponseDTO cart = cartService.getCart(request.idCart());
+    PagamentoIniciadoResponseDTO cart = cartService.getCart(request.idUser());
 
     Order order = new Order(
             request.idUser(),
             request.idStore(),
-            request.idCart(),
+            cart.carrinhoId(),
             request.paymentMethod()
     );
 

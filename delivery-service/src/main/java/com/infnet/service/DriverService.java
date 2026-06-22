@@ -18,8 +18,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @Transactional
 public class DriverService {
@@ -64,7 +62,7 @@ public class DriverService {
     }
 
     @Transactional(readOnly = true)
-    public DriverResponseDTO findById(UUID id){
+    public DriverResponseDTO findById(Long id){
         Driver driver = findEntity(id);
         return toResponse(driver);
     }
@@ -109,7 +107,7 @@ public class DriverService {
 
     @Transactional
     public DriverResponseDTO update(
-            UUID id,
+            Long id,
             DriverUpdateDTO dto
     ) {
 
@@ -126,7 +124,7 @@ public class DriverService {
 
     @Transactional
     public DriverResponseDTO setAvailable(
-            UUID driverId
+            Long driverId
     ) {
         Driver driver = findEntity(driverId);
 
@@ -137,7 +135,7 @@ public class DriverService {
 
     @Transactional
     public DriverResponseDTO setUnavailable(
-            UUID driverId
+            Long driverId
     ) {
         Driver driver = findEntity(driverId);
 
@@ -148,7 +146,7 @@ public class DriverService {
 
     @Transactional
     public DriverResponseDTO updateLocation (
-            UUID driverId,
+            Long driverId,
             DriverLocationUpdateDTO dto
     ) {
         Driver driver = findEntity(driverId);
@@ -161,7 +159,7 @@ public class DriverService {
         return toResponse(driver);
     }
 
-    public DriverResponseDTO delete(UUID id) {
+    public DriverResponseDTO delete(Long id) {
 
         Driver driver = findEntity(id);
 
@@ -172,7 +170,7 @@ public class DriverService {
         return response;
     }
 
-    private Driver findEntity(UUID id){
+    private Driver findEntity(Long id){
         return driverRepository.findById(id)
             .orElseThrow(() ->
                 new ResourceNotFoundException(

@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "${api.endpoints.cart}")
 public interface CartIClient {
 
-    @GetMapping("/order")
+    @GetMapping("/carts/order")
     PagamentoIniciadoResponseDTO getCart(@RequestHeader("X-User-Id") Long usuarioId);
 }
