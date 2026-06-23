@@ -20,7 +20,6 @@ public class KafkaStoreListener {
     public void receiveGeocodeEvent(StoreGeocodeEvent event) {
         log.info("Evento Geocode da Loja Recebido com Sucesso para Store ID: {}", event.storeId());
 
-        // Busca a loja, atualiza as coordenadas e salva
         repository.findById(event.storeId()).ifPresent(store -> {
             store.setLatitude(event.lat());
             store.setLongitude(event.lon());

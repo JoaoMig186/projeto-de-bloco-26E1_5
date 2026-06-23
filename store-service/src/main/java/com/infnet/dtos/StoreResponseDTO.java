@@ -13,7 +13,6 @@ public record StoreResponseDTO(
         String phone,
         boolean active
 ) {
-    // Construtor prático para converter diretamente da Entidade para o DTO
     public StoreResponseDTO(Store store) {
         this(
                 store.getId(),

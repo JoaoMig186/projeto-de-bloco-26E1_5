@@ -27,15 +27,9 @@ spring:
       properties:
         spring.json.trusted.packages: com.infnet.events
         spring.json.use.type.headers: false
+
 eureka:
-  instance:
-    hostname: host.docker.internal # Essencial para o API Gateway (no Docker) achar a sua IDE
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus,metrics

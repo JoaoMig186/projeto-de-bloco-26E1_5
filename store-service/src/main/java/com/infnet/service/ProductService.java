@@ -106,23 +106,4 @@ public class ProductService {
                 storeDTO
         );
     }
-
-//    private void syncWithSearchService(Product product, Store store) {
-//        long startTime = System.currentTimeMillis();
-//        ProductSyncDTO syncDTO = new ProductSyncDTO(
-//                product.getId(),
-//                product.getName(),
-//                product.getCategory(),
-//                product.getPrice(),
-//                store.getId(),
-//                store.getName(),
-//                store.getLatitude(),
-//                store.getLongitude()
-//        );
-//
-//        kafkaService.sendProductSyncEvent(syncDTO);
-//
-//        long endTime = System.currentTimeMillis();
-//        storeMetrics.recordKafkaSyncTime(endTime - startTime);
-//    }
 }
