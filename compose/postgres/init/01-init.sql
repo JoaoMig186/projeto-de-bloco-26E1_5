@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user_service.tb_customer_profiles (
 
 CREATE TABLE IF NOT EXISTS store_service.tb_stores (
    id BIGSERIAL PRIMARY KEY,
-   owner_id BIGINT NOT NULL
+   owner_id BIGINT NOT NULL,
    name VARCHAR(255) NOT NULL,
     cnpj VARCHAR(255) NOT NULL UNIQUE,
     address VARCHAR(255) NOT NULL,
