@@ -1,5 +1,6 @@
 package com.infnet.service;
 
+import com.infnet.dtos.GeocodeResponseDTO;
 import com.infnet.dtos.StoreRequestDTO;
 import com.infnet.dtos.StoreResponseDTO;
 import com.infnet.events.StoreCreatedEvent; // Importe o Record do Evento

@@ -10,9 +10,7 @@ import java.util.Optional;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    // Procura uma loja pelo CNPJ (útil para validação no momento do cadastro)
     Optional<Store> findByCnpj(String cnpj);
 
-    // Retorna apenas as lojas que estão ativas no sistema
     List<Store> findByActiveTrue();
 }

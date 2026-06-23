@@ -12,13 +12,8 @@ public class StoreMetrics {
         this.registry = registry;
     }
 
-    // Recebe a categoria para criar uma "Tag"
     public void incrementProductCreation(String category) {
         registry.counter("product_creation_total", "category", category).increment();
     }
 
-    public void recordKafkaSyncTime(long milliseconds) {
-        registry.timer("kafka_product_sync_time_ms")
-                .record(java.time.Duration.ofMillis(milliseconds));
-    }
 }

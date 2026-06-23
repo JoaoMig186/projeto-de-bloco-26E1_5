@@ -15,6 +15,12 @@ scrape_configs:
       - targets:
           - "user-service:8081"
 
+  - job_name: "search-service"
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - "search-service:8097"
+
   - job_name: "cart-service"
     metrics_path: /actuator/prometheus
     static_configs:
@@ -42,4 +48,13 @@ scrape_configs:
     static_configs:
         - targets:
             - "order-service:8091"
+<<<<<<< HEAD
 >>>>>>> a805f66e1f92a74ee4c25a020785b632c92952b2
+=======
+
+  - job_name: "store-service"
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - "store-service:8083"
+>>>>>>> 92b01203f1a2615b2bf75579639847c170c078fe
