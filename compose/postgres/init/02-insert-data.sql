@@ -13,14 +13,11 @@ VALUES
     (3, 'Rua Jardim Botânico, 1008 - Rio de Janeiro/RJ', -22.9636, -43.2230, 'PENDING_GEOCODE', NOW(), NOW());
 
 --> LOJAS
-INSERT INTO store_service.tb_stores
-(name,ownerId, cnpj, address, latitude, longitude, phone, active)
+INSERT INTO store_service.tb_stores (owner_id, name, cnpj, address, latitude, longitude, phone, active, average_rating, total_reviews)
 VALUES
-    ('Constrular', 1,'12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', true),
-
-    ('Casa do Pedreiro', 1,'12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', true),
-
-    ('Mundo da Construção', 1, '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', true);
+    (1, 'Constrular', '12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', TRUE, 0, 0),
+    (1, 'Casa do Pedreiro', '12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', TRUE, 0, 0),
+    (1, 'Mundo da Construção', '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', TRUE, 0, 0);
 
 --> PRODUTOS
 INSERT INTO store_service.tb_products

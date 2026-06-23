@@ -31,17 +31,17 @@ CREATE TABLE IF NOT EXISTS user_service.tb_customer_profiles (
 );
 
 CREATE TABLE IF NOT EXISTS store_service.tb_stores (
-   id BIGSERIAL PRIMARY KEY,
-   owner_id BIGINT NOT NULL,
-   name VARCHAR(255) NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    owner_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
     cnpj VARCHAR(255) NOT NULL UNIQUE,
     address VARCHAR(255) NOT NULL,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
     phone VARCHAR(255),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     average_rating DOUBLE PRECISION NOT NULL DEFAULT 0,
-    total_reviews BIGINT NOT NULL DEFAULT 0,
-    active BOOLEAN NOT NULL DEFAULT TRUE
+    total_reviews BIGINT NOT NULL DEFAULT 0
     );
 
 CREATE TABLE IF NOT EXISTS store_service.tb_products (
