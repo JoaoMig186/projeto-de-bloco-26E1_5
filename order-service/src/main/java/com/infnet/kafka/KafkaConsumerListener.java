@@ -1,7 +1,6 @@
 package com.infnet.kafka;
 
 import com.infnet.kafka.events.DeliveryUpdatedEvent;
-import com.infnet.kafka.events.PaymentUpdatedEvent;
 import com.infnet.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
