@@ -12,11 +12,6 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-//    Para Payment
-    public void sendOrderCreatedEvent(OrderCreatedEvent event){
-        kafkaTemplate.send("order-created-topic", event.orderId().toString(), event);
-    }
-
 //    Para Delivery
     public void sendPaymentApprovatedEvent(PaymentApprovatedEvent event){
         kafkaTemplate.send("payment-approvated-topic", event.orderId().toString(), event);

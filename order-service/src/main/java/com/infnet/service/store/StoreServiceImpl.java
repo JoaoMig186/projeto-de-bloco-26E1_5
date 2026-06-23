@@ -16,8 +16,8 @@ public class StoreServiceImpl implements StoreService {
     private final StoreIClient client;
 
     @Override
-    @Retry(name = "deliveryService")
-    @CircuitBreaker(name = "deliveryService", fallbackMethod = "fallBackGeocode")
+    @CircuitBreaker(name = "storeService", fallbackMethod = "fallBackGeocode")
+    @Retry(name = "storeService")
     public GeocodeResponseDTO getGeocode(Long id) {
         return client.getGeocode(id);
     }

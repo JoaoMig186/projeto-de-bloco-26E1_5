@@ -12,7 +12,7 @@ public class CartServiceMock implements CartService{
     @Override
     public PagamentoIniciadoResponseDTO getCart(Long usuarioId) {
         return new PagamentoIniciadoResponseDTO(
-                1L, 2L, BigDecimal.TEN, null, BigDecimal.TEN
+                1L, BigDecimal.TEN, BigDecimal.TEN, null
         );
     }
 }

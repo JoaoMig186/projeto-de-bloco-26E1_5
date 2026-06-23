@@ -9,5 +9,6 @@ public record CartItemResponseDTO(
         BigDecimal price,
         Double weight,
         Boolean fragile,
+        Integer quantity,
         StoreDTO store
 ) {}

@@ -23,6 +23,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -41,6 +44,12 @@ public class DeliveryService {
     ) {
         FreightResponseDTO freight = freightService.calculate(
                 new FreightRequestDTO(dto.distanceKm(), dto.weightKg())
+        );
+        log.info(
+                "Frete calculado para pedido {}. Valor={}, veículo={}",
+                dto.orderId(),
+                freight.freightValue(),
+                freight.vehicleType()
         );
 
         Driver driver = driverRepository.findFirstByAvailableTrueAndVehicleType(
@@ -71,6 +80,14 @@ public class DeliveryService {
         metrics.recordFreight(
                 delivery.getShippingPrice()
         );
+
+        log.info(
+                "Entrega {} criada para pedido {} com motorista {}",
+                delivery.getId(),
+                delivery.getOrderId(),
+                driver.getId()
+        );
+
         return toResponse(delivery);
     }
 
@@ -97,6 +114,10 @@ public class DeliveryService {
     public DeliveryResponseDTO startDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
+        log.info(
+                "Solicitação de início da entrega {}",
+                deliveryId
+        );
 
         producer.sendDeliveryUpdated(
                 new DeliveryUpdatedEvent(
@@ -106,12 +127,24 @@ public class DeliveryService {
         );
 
         delivery.startDelivery();
+
+        log.info(
+                "Entrega {} iniciada. Pedido {} agora está em trânsito",
+                delivery.getId(),
+                delivery.getOrderId()
+        );
+
         return toResponse(delivery);
     }
 
     public DeliveryResponseDTO finishDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
+
+        log.info(
+                "Solicitação de conclusão da entrega {}",
+                deliveryId
+        );
 
         Driver driver = driverRepository.findById(
                 delivery.getDriverId()
@@ -131,6 +164,12 @@ public class DeliveryService {
         driver.becomeAvailable();
         delivery.finishDelivery();
         metrics.incrementFinished();
+
+        log.info(
+                "Entrega {} finalizada com sucesso",
+                delivery.getId()
+        );
+
         return toResponse(delivery);
     }
 
@@ -138,7 +177,17 @@ public class DeliveryService {
         Delivery delivery =
                 findEntity(deliveryId);
 
+        log.info(
+                "Solicitação de cancelamento da entrega {}",
+                deliveryId
+        );
+
         delivery.cancel();
+
+        log.warn(
+                "Entrega {} cancelada",
+                delivery.getId()
+        );
 
         if(delivery.getDriverId() != null) {
             Driver driver = driverRepository.findById(

@@ -6,8 +6,8 @@ spring:
 
 management:
   server:
-    port: 8081
-  endpoint:
+    port: 8091
+  endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus

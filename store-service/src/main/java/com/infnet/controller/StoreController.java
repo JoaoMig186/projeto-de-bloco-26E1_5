@@ -1,5 +1,6 @@
 package com.infnet.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.infnet.dtos.*;
 import com.infnet.service.ProductService;
 import com.infnet.service.StoreService;
@@ -50,7 +51,7 @@ public class StoreController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) {
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) throws JsonProcessingException {
         ProductResponseDTO createdProduct = productService.createProduct(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
@@ -65,5 +66,13 @@ public class StoreController {
     @GetMapping("/products/{productId}/order-info")
     public ResponseEntity<OrderProductInfoDTO> getProductInfoForOrder(@PathVariable("productId") Long productId) {
         return ResponseEntity.ok(productService.getProductInfoForOrder(productId));
+    }
+
+    // Endpoint para consumo do Order Service via OpenFeign
+    @GetMapping("/{id}/geocode")
+    public ResponseEntity<GeocodeResponseDTO> getStoreGeocode(@PathVariable("id") Long id) {
+        // O storeService deverá ter a lógica para ir buscar a loja e devolver as coordenadas
+        GeocodeResponseDTO geocode = storeService.getStoreGeocode(id);
+        return ResponseEntity.ok(geocode);
     }
 }
