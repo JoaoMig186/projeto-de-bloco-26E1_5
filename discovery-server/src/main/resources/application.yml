@@ -8,7 +8,9 @@ eureka:
     fetch-registry: false
     register-with-eureka: false
 management:
+  server:
+    port: 8100
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus

@@ -34,14 +34,9 @@ security:
   public-key: classpath:keys/public_key.pem
 
 management:
-  tracing:
-    sampling:
-      probability: 1.0
-
-  zipkin:
-    tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
+  server:
+    port: 8099
   endpoints:
     web:
       exposure:
-        include: gateway,health,info
+        include: health,info,metrics,prometheus
