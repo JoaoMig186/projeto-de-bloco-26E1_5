@@ -2,12 +2,12 @@ package com.infnet.service;
 
 import com.infnet.domain.entity.Delivery;
 import com.infnet.domain.entity.Driver;
-import com.infnet.domain.entity.enums.DeliveryStatus;
 import com.infnet.dto.request.freight.FreightRequestDTO;
 import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.dto.request.delivery.DeliveryRequestDTO;
 import com.infnet.dto.response.delivery.DeliveryResponseDTO;
 import com.infnet.events.DeliveryUpdatedEvent;
+import com.infnet.events.PaymentApprovatedEvent;
 import com.infnet.exception.ResourceNotFoundException;
 import com.infnet.kafka.DeliveryKafkaProducer;
 import com.infnet.metrics.DeliveryMetrics;
@@ -219,39 +219,35 @@ public class DeliveryService {
     }
 
     @Transactional
-    public void startDeliveryFromPayment(Long orderId) {
+    public void createFromPayment(PaymentApprovatedEvent event) {
 
-        Delivery delivery = deliveryRepository.findByOrderId(orderId)
-                .orElse(null);
+        log.info("Criando delivery a partir do pagamento aprovado do pedido {}", event.orderId());
 
-        if (delivery == null) {
-
-            log.info("Nenhuma entrega encontrada para orderId {}. Criando automaticamente.", orderId);
-
-            delivery = Delivery.create(
-                    orderId,
-                    "UNKNOWN",
-                    "UNKNOWN",
-                    0.0,
-                    0,
-                    0.0
-            );
-
-            delivery = deliveryRepository.save(delivery);
-        }
-
-        if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT) {
-            log.info("Entrega {} já está em trânsito", delivery.getId());
-            return;
-        }
-
-        delivery.startDelivery();
-
-        log.info(
-                "Entrega {} iniciada via evento de pagamento para order {}",
-                delivery.getId(),
-                orderId
+        FreightResponseDTO freight = freightService.calculate(
+                new FreightRequestDTO(event.distanceKm(), event.shippingPrice().doubleValue())
         );
+
+        Driver driver = driverRepository.findFirstByAvailableTrueAndVehicleType(
+                freight.vehicleType()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Nenhum motorista disponível")
+        );
+
+        Delivery delivery = Delivery.create(
+                event.orderId(),
+                "ORIGIN",
+                "DESTINATION",
+                event.distanceKm(),
+                freight.estimatedMinutes(),
+                freight.freightValue()
+        );
+
+        delivery.assignDriver(driver.getId());
+        driver.becomeUnavailable();
+
+        deliveryRepository.save(delivery);
+
+        log.info("Delivery criado com sucesso para order {}", event.orderId());
     }
 
     private Delivery findEntity(Long id) {
