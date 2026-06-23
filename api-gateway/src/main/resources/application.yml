@@ -34,9 +34,7 @@ security:
   public-key: classpath:keys/public_key.pem
 
 management:
-  server:
-    port: 8099
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics

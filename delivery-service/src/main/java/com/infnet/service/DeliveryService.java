@@ -154,15 +154,16 @@ public class DeliveryService {
                 )
         );
 
+
+
+        driver.becomeAvailable();
+        delivery.finishDelivery();
         producer.sendDeliveryUpdated(
                 new DeliveryUpdatedEvent(
                         delivery.getOrderId(),
                         delivery.getStatus().name()
                 )
         );
-
-        driver.becomeAvailable();
-        delivery.finishDelivery();
         metrics.incrementFinished();
 
         log.info(

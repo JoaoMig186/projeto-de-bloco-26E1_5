@@ -44,16 +44,5 @@ scrape_configs:
     static_configs:
       - targets:
           - "store-service:8083"
-  - job_name: "api-gateway"
-    metrics_path: /actuator/prometheus
-    static_configs:
-      - targets:
-          - "api-gateway:8099"
-
-  - job_name: "discovery-server"
-    metrics_path: /actuator/prometheus
-    static_configs:
-      - targets:
-          - "discovery-server:8100"
 
 

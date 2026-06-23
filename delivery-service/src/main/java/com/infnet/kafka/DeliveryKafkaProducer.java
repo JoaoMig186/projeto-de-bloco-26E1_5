@@ -13,7 +13,7 @@ public class DeliveryKafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    private static final String TOPIC = "delivery-updated-topic";
+    private static final String TOPIC = "delivery-status-updated-topic";
 
     public void sendDeliveryUpdated(DeliveryUpdatedEvent event) {
 
