@@ -62,16 +62,16 @@ services:
     build: ../search-service
     container_name: search-service
 
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      elasticsearch-db:
+        condition: service_healthy
 
     networks:
       - icimento-network
 
-    depends_on:
-      discovery-server:
-        condition: service_healthy
 
-      postgres:
-        condition: service_healthy
 
   # GEOCODE-FAKE-SERVICE
   geocode-fake-service:
@@ -246,15 +246,6 @@ services:
     networks:
       - icimento-network
 
-  #ZIPKIN
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      - icimento-network
-
   elasticsearch-db:
     image: elasticsearch:8.19.2
     container_name: elasticsearch-db
@@ -265,6 +256,14 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
     restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
     networks:
       - icimento-network
 

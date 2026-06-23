@@ -3,23 +3,22 @@ package com.infnet.events;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record GeocodeEvent(
+public record StoreGeocodeEvent(
         String eventId,
-        Long userId,
+        Long storeId,
         Double lat,
         Double lon,
         LocalDateTime dateTime,
         String correlationId
 ) {
-    public static GeocodeEvent createEvent(Long userId, Double lat, Double lon){
-        String correlationId = UUID.randomUUID().toString();
-        return new GeocodeEvent(
+    public static StoreGeocodeEvent createEvent(Long storeId, Double lat, Double lon) {
+        return new StoreGeocodeEvent(
                 UUID.randomUUID().toString(),
-                userId,
+                storeId,
                 lat,
                 lon,
                 LocalDateTime.now(),
-                correlationId
+                UUID.randomUUID().toString()
         );
     }
 }

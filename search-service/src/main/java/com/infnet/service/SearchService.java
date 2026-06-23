@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.StoreProductsDTO;
 import com.infnet.kafka.KafkaSearchListener;
+import com.infnet.metrics.SearchMetrics;
 import com.infnet.model.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,50 +20,42 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class SearchService {
 
     private final ElasticsearchClient client;
-    private static final Logger log = LoggerFactory.getLogger(SearchService.class);
+    private final SearchMetrics metrics;
+
     public List<StoreProductsDTO> listProductsByMultimatchFuzzyGroupedByStore(String term) throws IOException {
 
-        log.info("Termo pesquisado: {}", term);
-
+        metrics.incrementTotalSearchs();
         SearchResponse<ProductDocument> search = client.search(
                 s -> s
                         .index("products")
                         .query(q -> q
                                 .multiMatch(m -> m
                                         .query(term)
-                                        .fields("name", "description", "category")
+                                        .fields("name", "description", "category","storeName")
                                         .fuzziness("AUTO")
                                 )
                         ),
                 ProductDocument.class
         );
 
-        log.info("Total de hits: {}", search.hits().total());
-
-        search.hits().hits().forEach(hit ->
-                log.info("Documento encontrado: {}", hit.source())
-        );
 
         List<ProductResponseDTO> hits = search.hits().hits()
                 .stream()
                 .map(ProductResponseDTO::toDTO)
                 .toList();
 
-        log.info("DTOs gerados: {}", hits.size());
 
         List<StoreProductsDTO> storeProducts = new ArrayList<>();
 
         for (ProductResponseDTO product : hits) {
 
-            log.info("Processando produto: {}", product);
 
             Long storeId = product.storeId();
 
@@ -72,7 +65,6 @@ public class SearchService {
                     .orElse(null);
 
             if (store == null) {
-                log.info("Criando grupo para loja {}", storeId);
 
                 store = new StoreProductsDTO(
                         storeId,
@@ -85,8 +77,6 @@ public class SearchService {
 
             store.products().add(product);
         }
-
-        log.info("Resultado final: {}", storeProducts);
 
         return storeProducts;
     }

@@ -21,13 +21,6 @@ spring:
               uri: lb://SEARCH-SERVICE
               predicates:
                 - Path=/icimento/**
-            #- id: store
-            #  uri: lb://STORE
-            #  predicates:
-            #    - Path=/stores/**
-            #  filters:
-            #   - StripPrefix=1
-
 eureka:
   client:
     service-url:
@@ -41,14 +34,7 @@ security:
   public-key: classpath:keys/public_key.pem
 
 management:
-  tracing:
-    sampling:
-      probability: 1.0
-
-  zipkin:
-    tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
   endpoints:
     web:
       exposure:
-        include: gateway,health,info
+        include: health,info,metrics

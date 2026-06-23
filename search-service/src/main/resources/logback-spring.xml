@@ -2,7 +2,7 @@
     <springProperty scope="context"
                     name="APP_NAME"
                     source="spring.application.name"
-                    defaultValue="unknown-service"/>
+                    defaultValue="search-service"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

@@ -3,21 +3,15 @@ spring:
     name: review-service
   profiles:
     active: prod
+
 api:
   endpoints:
     store: STORE-SERVICE
-resilience4j:
-  circuitbreaker:
-    instances:
-      storeValidation:
-        slidingWindowSize: 4
-        minimumNumberOfCalls: 4
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 2
 
 management:
+  server:
+    port: 8087
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health,info,metrics,prometheus

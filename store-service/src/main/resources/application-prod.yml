@@ -13,20 +13,19 @@ spring:
     show-sql: false
   kafka:
     bootstrap-servers: kafka:29092
-    consumer:
-      group-id: store-group
-      auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: store-service-v1
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.infnet.events
+        spring.json.use.type.headers: true
 
 eureka:
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus,metrics

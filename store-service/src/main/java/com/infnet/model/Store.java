@@ -19,6 +19,9 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
     @Column(nullable = false)
     private String name;
 
@@ -26,7 +29,7 @@ public class Store {
     private String cnpj;
 
     @Column(nullable = false)
-    private String address; // Pode ser evoluído para uma entidade separada no futuro
+    private String address;
 
     private Double latitude;
 
@@ -34,7 +37,13 @@ public class Store {
 
     private String phone;
 
-    private boolean active = true; // Para inativar uma loja sem deletar os dados
+    private boolean active = true;
+
+    @Column(name = "average_rating", nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews", nullable = false)
+    private Long totalReviews = 0L;
 
     // Uma loja possui vários produtos.
     // Se a loja for removida, os produtos dela também saem (cascade).

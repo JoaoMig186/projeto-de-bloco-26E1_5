@@ -1,5 +1,6 @@
 package com.infnet.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class ItemOrder {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     public ItemOrder(Long itemId, Long lojaId, String nomeProduto, Boolean fragil, Double peso, Integer quantidade, Order order) {

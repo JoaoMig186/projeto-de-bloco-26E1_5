@@ -44,6 +44,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Não Encontrado",
+                List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
     @ExceptionHandler(DuplicateReviewException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateReview(DuplicateReviewException ex) {
         ErrorResponse error = new ErrorResponse(
@@ -55,16 +67,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException ex) {
+    @ExceptionHandler(ReviewAlreadyRepliedException.class)
+    public ResponseEntity<ErrorResponse> handleReviewAlreadyReplied(ReviewAlreadyRepliedException ex) {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Não Encontrado",
+                HttpStatus.CONFLICT.value(),
+                "Conflito",
                 List.of(ex.getMessage())
         );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(StoreNotFoundException.class)

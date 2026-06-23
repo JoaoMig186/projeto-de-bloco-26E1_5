@@ -28,7 +28,7 @@ public class OutboxProductEvent {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private JsonNode payload;
+    private String payload;
 
     private Boolean processed;
 
@@ -36,7 +36,7 @@ public class OutboxProductEvent {
 
     }
 
-    public OutboxProductEvent(Long productId, ProductEventType eventType, JsonNode payload){
+    public OutboxProductEvent(Long productId, ProductEventType eventType, String payload){
         this.productId = productId;
         this.eventType = eventType;
         this.payload = payload;

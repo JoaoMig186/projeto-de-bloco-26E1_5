@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/reviews")
@@ -32,16 +31,6 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ReviewResponse.toResponse(review));
     }
 
-    @PostMapping("/{reviewId}/reply")
-    public ResponseEntity<ReviewResponse> reply(
-            @PathVariable("reviewId") UUID reviewId,
-            @RequestHeader("X-User-Role") String role,
-            @RequestHeader("X-User-Id") Long userId,
-            @RequestBody @Valid CreateReplyRequest request) {
-        Review review = service.reply(reviewId, request, role, userId);
-        return ResponseEntity.ok(ReviewResponse.toResponse(review));
-    }
-
     @GetMapping("/store/{storeId}")
     public ResponseEntity<List<ReviewResponse>> findByStore(@PathVariable("storeId") Long storeId) {
         List<ReviewResponse> reviews = service.findByStore(storeId)
@@ -54,5 +43,23 @@ public class ReviewController {
     @GetMapping("/store/{storeId}/summary")
     public ResponseEntity<StoreReviewSummaryResponse> getSummary(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(service.getSummary(storeId));
+    }
+
+    @PostMapping("/{reviewId}/reply")
+    public ResponseEntity<ReviewResponse> reply(
+            @PathVariable("reviewId") Long reviewId,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody @Valid CreateReplyRequest request) {
+        Review review = service.reply(reviewId, request, role, userId);
+        return ResponseEntity.ok(ReviewResponse.toResponse(review));
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable("reviewId") Long reviewId,
+            @RequestHeader("X-User-Role") String role) {
+        service.delete(reviewId, role);
+        return ResponseEntity.noContent().build();
     }
 }

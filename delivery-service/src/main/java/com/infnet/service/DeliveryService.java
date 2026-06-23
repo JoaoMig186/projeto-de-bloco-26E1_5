@@ -2,12 +2,12 @@ package com.infnet.service;
 
 import com.infnet.domain.entity.Delivery;
 import com.infnet.domain.entity.Driver;
-import com.infnet.domain.entity.enums.DeliveryStatus;
 import com.infnet.dto.request.freight.FreightRequestDTO;
 import com.infnet.dto.request.freight.FreightResponseDTO;
 import com.infnet.dto.request.delivery.DeliveryRequestDTO;
 import com.infnet.dto.response.delivery.DeliveryResponseDTO;
 import com.infnet.events.DeliveryUpdatedEvent;
+import com.infnet.events.PaymentApprovatedEvent;
 import com.infnet.exception.ResourceNotFoundException;
 import com.infnet.kafka.DeliveryKafkaProducer;
 import com.infnet.metrics.DeliveryMetrics;
@@ -23,6 +23,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -41,6 +44,12 @@ public class DeliveryService {
     ) {
         FreightResponseDTO freight = freightService.calculate(
                 new FreightRequestDTO(dto.distanceKm(), dto.weightKg())
+        );
+        log.info(
+                "Frete calculado para pedido {}. Valor={}, veículo={}",
+                dto.orderId(),
+                freight.freightValue(),
+                freight.vehicleType()
         );
 
         Driver driver = driverRepository.findFirstByAvailableTrueAndVehicleType(
@@ -71,6 +80,14 @@ public class DeliveryService {
         metrics.recordFreight(
                 delivery.getShippingPrice()
         );
+
+        log.info(
+                "Entrega {} criada para pedido {} com motorista {}",
+                delivery.getId(),
+                delivery.getOrderId(),
+                driver.getId()
+        );
+
         return toResponse(delivery);
     }
 
@@ -97,6 +114,10 @@ public class DeliveryService {
     public DeliveryResponseDTO startDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
+        log.info(
+                "Solicitação de início da entrega {}",
+                deliveryId
+        );
 
         producer.sendDeliveryUpdated(
                 new DeliveryUpdatedEvent(
@@ -106,12 +127,24 @@ public class DeliveryService {
         );
 
         delivery.startDelivery();
+
+        log.info(
+                "Entrega {} iniciada. Pedido {} agora está em trânsito",
+                delivery.getId(),
+                delivery.getOrderId()
+        );
+
         return toResponse(delivery);
     }
 
     public DeliveryResponseDTO finishDelivery(Long deliveryId) {
         Delivery delivery =
                 findEntity(deliveryId);
+
+        log.info(
+                "Solicitação de conclusão da entrega {}",
+                deliveryId
+        );
 
         Driver driver = driverRepository.findById(
                 delivery.getDriverId()
@@ -121,16 +154,23 @@ public class DeliveryService {
                 )
         );
 
+
+
+        driver.becomeAvailable();
+        delivery.finishDelivery();
         producer.sendDeliveryUpdated(
                 new DeliveryUpdatedEvent(
                         delivery.getOrderId(),
                         delivery.getStatus().name()
                 )
         );
-
-        driver.becomeAvailable();
-        delivery.finishDelivery();
         metrics.incrementFinished();
+
+        log.info(
+                "Entrega {} finalizada com sucesso",
+                delivery.getId()
+        );
+
         return toResponse(delivery);
     }
 
@@ -138,7 +178,17 @@ public class DeliveryService {
         Delivery delivery =
                 findEntity(deliveryId);
 
+        log.info(
+                "Solicitação de cancelamento da entrega {}",
+                deliveryId
+        );
+
         delivery.cancel();
+
+        log.warn(
+                "Entrega {} cancelada",
+                delivery.getId()
+        );
 
         if(delivery.getDriverId() != null) {
             Driver driver = driverRepository.findById(
@@ -170,18 +220,35 @@ public class DeliveryService {
     }
 
     @Transactional
-    public void startDeliveryFromPayment(Long orderId) {
+    public void createFromPayment(PaymentApprovatedEvent event) {
 
-        Delivery delivery = deliveryRepository.findByOrderId(orderId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Entrega não localizada pelo pedido " + orderId)
-                );
+        log.info("Criando delivery a partir do pagamento aprovado do pedido {}", event.orderId());
 
-        if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT) {
-            return;
-        }
+        FreightResponseDTO freight = freightService.calculate(
+                new FreightRequestDTO(event.distanceKm(), event.shippingPrice().doubleValue())
+        );
 
-        delivery.startDelivery();
+        Driver driver = driverRepository.findFirstByAvailableTrueAndVehicleType(
+                freight.vehicleType()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Nenhum motorista disponível")
+        );
+
+        Delivery delivery = Delivery.create(
+                event.orderId(),
+                "ORIGIN",
+                "DESTINATION",
+                event.distanceKm(),
+                freight.estimatedMinutes(),
+                freight.freightValue()
+        );
+
+        delivery.assignDriver(driver.getId());
+        driver.becomeUnavailable();
+
+        deliveryRepository.save(delivery);
+
+        log.info("Delivery criado com sucesso para order {}", event.orderId());
     }
 
     private Delivery findEntity(Long id) {

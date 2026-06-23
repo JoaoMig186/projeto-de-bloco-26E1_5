@@ -36,7 +36,7 @@ public class ProductService {
     private final OutboxProductEventRepository outboxRepository;
 
     @Transactional
-    public ProductResponseDTO createProduct(ProductRequestDTO dto) {
+    public ProductResponseDTO createProduct(ProductRequestDTO dto) throws JsonProcessingException {
 
         Store store = storeRepository.findById(dto.storeId())
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada para associar o produto."));
@@ -58,9 +58,9 @@ public class ProductService {
 
         product = productRepository.save(product);
 
-        JsonNode payload = objectMapper.valueToTree(
-                ProductSyncDTO.fromDomain(product)
-        );
+        ProductSyncDTO productDTO = ProductSyncDTO.fromDomain(product);
+
+        String payload = objectMapper.writeValueAsString(productDTO);
 
         OutboxProductEvent event = new OutboxProductEvent(
                 product.getId(),
@@ -106,23 +106,4 @@ public class ProductService {
                 storeDTO
         );
     }
-
-//    private void syncWithSearchService(Product product, Store store) {
-//        long startTime = System.currentTimeMillis();
-//        ProductSyncDTO syncDTO = new ProductSyncDTO(
-//                product.getId(),
-//                product.getName(),
-//                product.getCategory(),
-//                product.getPrice(),
-//                store.getId(),
-//                store.getName(),
-//                store.getLatitude(),
-//                store.getLongitude()
-//        );
-//
-//        kafkaService.sendProductSyncEvent(syncDTO);
-//
-//        long endTime = System.currentTimeMillis();
-//        storeMetrics.recordKafkaSyncTime(endTime - startTime);
-//    }
 }

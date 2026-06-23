@@ -1,7 +1,5 @@
 package com.infnet.kafka;
 
-import com.infnet.domain.Order;
-import com.infnet.kafka.events.OrderCreatedEvent;
 import com.infnet.kafka.events.PaymentApprovatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,11 +9,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaProducerService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-//    Para Payment
-    public void sendOrderCreatedEvent(OrderCreatedEvent event){
-        kafkaTemplate.send("order-created-topic", event.orderId().toString(), event);
-    }
 
 //    Para Delivery
     public void sendPaymentApprovatedEvent(PaymentApprovatedEvent event){

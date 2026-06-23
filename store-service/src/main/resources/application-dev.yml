@@ -16,22 +16,20 @@ spring:
         format_sql: true
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: store-group
-      auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer:  org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: store-service-v1
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.infnet.events
+        spring.json.use.type.headers: false
 
 eureka:
-  instance:
-    hostname: host.docker.internal # Essencial para o API Gateway (no Docker) achar a sua IDE
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus,metrics
