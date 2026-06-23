@@ -39,7 +39,7 @@ api:
   endpoints:
     user: USER-SERVICE
     store: STORE-SERVICE
-    payment: PAYMENT-SERVICE
+
     delivery: DELIVERY-SERVICE
     cart: CART-SERVICE
 
@@ -53,9 +53,48 @@ resilience4j:
           - feign.FeignException
           - java.net.ConnectException
           - java.net.SocketTimeoutException
+      cartService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - feign.FeignException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+      storeService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - feign.FeignException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+      userService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - feign.FeignException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
   circuitbreaker:
     instances:
+      cartService:
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
       deliveryService:
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+      storeService:
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+      userService:
         slidingWindowSize: 4
         minimumNumberOfCalls: 4
         failureRateThreshold: 50

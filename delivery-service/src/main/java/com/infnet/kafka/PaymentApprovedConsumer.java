@@ -20,7 +20,11 @@ public class PaymentApprovedConsumer {
     )
     public void consume(PaymentApprovatedEvent event) {
 
-        log.info("Payment event received: {}", event);
+        log.info(
+                "Evento de pagamento recebido. Pedido={}, aprovado={}",
+                event.orderId(),
+                event.paymentApproved()
+        );
 
         if (Boolean.TRUE.equals(event.paymentApproved())) {
 

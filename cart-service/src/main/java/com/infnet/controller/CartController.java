@@ -26,55 +26,50 @@ public class CartController {
                 .body(service.createCart(userId));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping
     public ResponseEntity<Cart> getCart(
-            @PathVariable("id") Long id,
             @RequestHeader(name = "X-User-Id", required = true) Long userId    ) {
 
         return ResponseEntity.ok(
-                service.getCart(id, userId)
+                service.getCart(userId)
         );
     }
-    @PostMapping("/{id}/items")
+    @PostMapping("/items")
     public ResponseEntity<Cart> addItem(
-            @PathVariable("id") Long id,
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @RequestBody AddItemDTO dto
     ) {
 
         return ResponseEntity.ok(
-                service.addItem(id, userId, dto)
+                service.addItem( userId, dto)
         );
     }
 
-    @DeleteMapping("/{id}/items/{itemId}")
+    @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Cart> removeItem(
-            @PathVariable("id") Long id,
             @PathVariable("itemId") Long itemId,
             @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
 
         return ResponseEntity.ok(
-                service.removeItem(id, userId, itemId)
+                service.removeItem( userId, itemId)
         );
     }
-    @PostMapping("/{id}/finalize")
+    @PostMapping("/finalize")
     public ResponseEntity<Cart> finalizeCart(
-            @PathVariable("id") Long id,
             @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
         return ResponseEntity.ok(
-                service.finalizeCart(id, userId)
+                service.finalizeCart( userId)
         );
     }
-    @DeleteMapping("/{id}/clear")
+    @DeleteMapping("/clear")
     public ResponseEntity<Cart> clearCart(
-            @PathVariable("id") Long id,
             @RequestHeader(name = "X-User-Id", required = true) Long userId
     ) {
 
         return ResponseEntity.ok(
-                service.clearCart(id, userId)
+                service.clearCart( userId)
         );
     }
 
