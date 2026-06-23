@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.infnet.dtos.ProductResponseDTO;
 import com.infnet.dtos.StoreProductsDTO;
 import com.infnet.kafka.KafkaSearchListener;
+import com.infnet.metrics.SearchMetrics;
 import com.infnet.model.ProductDocument;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,9 +27,11 @@ import java.util.List;
 public class SearchService {
 
     private final ElasticsearchClient client;
+    private final SearchMetrics metrics;
+
     public List<StoreProductsDTO> listProductsByMultimatchFuzzyGroupedByStore(String term) throws IOException {
 
-
+        metrics.incrementTotalSearchs();
         SearchResponse<ProductDocument> search = client.search(
                 s -> s
                         .index("products")
