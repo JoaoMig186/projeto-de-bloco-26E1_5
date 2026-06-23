@@ -222,15 +222,36 @@ public class DeliveryService {
     public void startDeliveryFromPayment(Long orderId) {
 
         Delivery delivery = deliveryRepository.findByOrderId(orderId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Entrega não localizada pelo pedido " + orderId)
-                );
+                .orElse(null);
+
+        if (delivery == null) {
+
+            log.info("Nenhuma entrega encontrada para orderId {}. Criando automaticamente.", orderId);
+
+            delivery = Delivery.create(
+                    orderId,
+                    "UNKNOWN",
+                    "UNKNOWN",
+                    0.0,
+                    0,
+                    0.0
+            );
+
+            delivery = deliveryRepository.save(delivery);
+        }
 
         if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT) {
+            log.info("Entrega {} já está em trânsito", delivery.getId());
             return;
         }
 
         delivery.startDelivery();
+
+        log.info(
+                "Entrega {} iniciada via evento de pagamento para order {}",
+                delivery.getId(),
+                orderId
+        );
     }
 
     private Delivery findEntity(Long id) {
