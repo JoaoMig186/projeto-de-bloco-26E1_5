@@ -1,7 +1,5 @@
 package com.infnet.kafka;
 
-import com.infnet.domain.Order;
-import com.infnet.kafka.events.OrderCreatedEvent;
 import com.infnet.kafka.events.PaymentApprovatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

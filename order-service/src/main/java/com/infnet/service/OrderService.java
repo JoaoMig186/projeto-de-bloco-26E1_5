@@ -3,8 +3,6 @@ package com.infnet.service;
 import com.infnet.domain.ItemOrder;
 import com.infnet.domain.Order;
 import com.infnet.domain.enums.DeliveryStatus;
-import com.infnet.domain.enums.OrderStatus;
-import com.infnet.domain.enums.PaymentStatus;
 import com.infnet.dto.OrderRequestDTO;
 import com.infnet.dto.cart.PagamentoIniciadoResponseDTO;
 import com.infnet.dto.delivery.DeliveryShipResponse;
@@ -12,7 +10,6 @@ import com.infnet.dto.delivery.FreightRequestDTO;
 import com.infnet.dto.store.GeocodeResponseDTO;
 import com.infnet.excepton.OrderNotFoundException;
 import com.infnet.kafka.KafkaProducerService;
-import com.infnet.kafka.events.OrderCreatedEvent;
 import com.infnet.kafka.events.PaymentApprovatedEvent;
 import com.infnet.metrics.OrderMetrics;
 import com.infnet.repository.OrderRepository;
@@ -77,8 +74,10 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
         GeocodeResponseDTO geocodeUser = userService.getGeocode(userId);
         GeocodeResponseDTO geocodeStore = storeService.getGeocode(request.idStore());
 
+        Double distanceKm = haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon());
+
         FreightRequestDTO dto = new FreightRequestDTO(
-                haversine(geocodeStore.lat(), geocodeStore.lon(), geocodeUser.lat(), geocodeUser.lon()),
+                distanceKm,
                 cart.valorTotalKg()
         );
 
@@ -97,7 +96,11 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
 
         kafkaProducerService.sendPaymentApprovatedEvent(
                 new PaymentApprovatedEvent(
-                        saved.getId(), true
+                        saved.getId(),
+                        true,
+                        distanceKm,
+                        saved.getEstimatedMinutes(),
+                        saved.getShippingPrice()
                 )
         );
 
@@ -107,8 +110,6 @@ public Order registerOrder(OrderRequestDTO request, Long userId){
         return saved;
     });
 }
-
-
 
 //    ✅ Metodo Kafka
     @Transactional

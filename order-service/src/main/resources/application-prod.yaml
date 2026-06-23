@@ -27,7 +27,7 @@ spring:
       properties:
         spring.json.use.type.headers: false
         spring.json.trusted.packages: com.infnet.kafka.events
-
+        spring.json.value.default.type: com.infnet.kafka.events.DeliveryUpdatedEvent
 eureka:
   client:
     service-url:
