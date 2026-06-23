@@ -1,6 +1,6 @@
-package com.infnet.api.dto;
+package com.infnet.dtos;
 
 public record ValidacaoStoreResponse(
-        Long id,
+        Long storeId,
         Long ownerId
-) {}
+) { }

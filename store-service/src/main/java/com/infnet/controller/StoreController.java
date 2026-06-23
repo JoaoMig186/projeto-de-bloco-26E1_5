@@ -21,8 +21,8 @@ public class StoreController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<StoreResponseDTO> createStore(@Valid @RequestBody StoreRequestDTO dto) {
-        StoreResponseDTO createdStore = storeService.createStore(dto);
+    public ResponseEntity<StoreResponseDTO> createStore(@Valid @RequestBody StoreRequestDTO dto, @RequestHeader("X-User-Id") Long ownerId) {
+        StoreResponseDTO createdStore = storeService.createStore(dto, ownerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
     }
 
@@ -40,6 +40,12 @@ public class StoreController {
     public ResponseEntity<Void> deactivateStore(@PathVariable("id") Long id) {
         storeService.deactivateStore(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Rota para o Review Service validar se a loja existe
+    @GetMapping("/{id}/validation")
+    public ResponseEntity<ValidacaoStoreResponse> validateStore(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(storeService.validateStore(id));
     }
 
     @PostMapping("/products")

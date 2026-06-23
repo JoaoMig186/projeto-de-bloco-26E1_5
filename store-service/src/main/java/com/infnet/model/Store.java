@@ -19,6 +19,9 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
     @Column(nullable = false)
     private String name;
 
@@ -36,6 +39,14 @@ public class Store {
 
     private boolean active = true;
 
+    @Column(name = "average_rating", nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews", nullable = false)
+    private Long totalReviews = 0L;
+
+    // Uma loja possui vários produtos.
+    // Se a loja for removida, os produtos dela também saem (cascade).
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 }

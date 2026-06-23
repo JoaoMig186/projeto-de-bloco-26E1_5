@@ -22,9 +22,8 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.value.default.type: com.infnet.events.StoreGeocodeEvent
         spring.json.trusted.packages: com.infnet.events
-        spring.json.use.type.headers: false
+        spring.json.use.type.headers: true
 
 eureka:
   client:

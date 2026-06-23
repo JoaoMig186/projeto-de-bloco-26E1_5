@@ -7,9 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface ReviewRepository extends JpaRepository<Review, UUID> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByStoreIdAndAuthorId(Long storeId, Long authorId);
 
     List<Review> findByStoreId(Long storeId);
@@ -18,4 +17,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     Optional<Double> findAverageRatingByStoreId(@Param("storeId") Long storeId);
 
     Long countByStoreId(Long storeId);
+
+    Optional<Review> findById(Long reviewId);
 }
