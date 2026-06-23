@@ -28,7 +28,6 @@ public class PaymentApprovedConsumer {
 
         if (Boolean.TRUE.equals(event.paymentApproved())) {
 
-            deliveryService.startDeliveryFromPayment(event.orderId());
-        }
+            deliveryService.createFromPayment(event);        }
     }
 }
