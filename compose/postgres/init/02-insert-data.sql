@@ -14,13 +14,13 @@ VALUES
 
 --> LOJAS
 INSERT INTO store_service.tb_stores
-(name, cnpj, address, latitude, longitude, phone, active)
+(name,ownerId, cnpj, address, latitude, longitude, phone, active)
 VALUES
-    ('Constrular', '12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', true),
+    ('Constrular', 1,'12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', true),
 
-    ('Casa do Pedreiro', '12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', true),
+    ('Casa do Pedreiro', 1,'12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', true),
 
-    ('Mundo da Construção', '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', true);
+    ('Mundo da Construção', 1, '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', true);
 
 --> PRODUTOS
 INSERT INTO store_service.tb_products
