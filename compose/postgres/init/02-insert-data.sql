@@ -15,9 +15,9 @@ VALUES
 --> LOJAS
 INSERT INTO store_service.tb_stores (owner_id, name, cnpj, address, latitude, longitude, phone, active, average_rating, total_reviews)
 VALUES
-    (1, 'Constrular', '12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', TRUE, 0, 0),
-    (1, 'Casa do Pedreiro', '12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', TRUE, 0, 0),
-    (1, 'Mundo da Construção', '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', TRUE, 0, 0);
+    (3, 'Constrular', '12345678000101', 'Rua A, 100', -22.90, -43.20, '21999990001', TRUE, 0, 0),
+    (3, 'Casa do Pedreiro', '12345678000102', 'Rua B, 200', -22.91, -43.21, '21999990002', TRUE, 0, 0),
+    (3, 'Mundo da Construção', '12345678000103', 'Rua C, 300', -22.92, -43.22, '21999990003', TRUE, 0, 0);
 
 --> PRODUTOS
 INSERT INTO store_service.tb_products
